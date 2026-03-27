@@ -42,7 +42,7 @@ export interface SummonerProfileResponse {
         level: number;
         profileIconId: number;
         // Full URL ready to use in an <img> tag //
-        profileIconUrl: string;     // missing from route response, will fix later //
+        profileIconUrl: string;
     };
     ranked: {
         soloQueue: RankedStats | null;
