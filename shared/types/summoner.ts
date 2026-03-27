@@ -1,6 +1,14 @@
 // Shared API response types
-// Import these in website and mobile instead of defining your own.
-// import type { SummonerProfileResponse, ApiError } from "../../shared/types"; // Example import //
+// I misunderstood the compatability and this won't actually be shared between frontend and backend, so it's just documentation
+// No need to import anything no more, you'll call straight from the backend route handlers and return these shapes as JSON responses.
+// EXAMPLE USAGE:
+// const [summoner, setSummoner] = useState(null);
+//
+//async function searchSummoner(gameName, tagLine) {
+//  const res = await fetch(`http://localhost:3000/summoner/${gameName}/${tagLine}`);
+//  const data = await res.json();
+//  setSummoner(data);
+//}
 
 export type Tier =
     | "IRON" | "BRONZE" | "SILVER" | "GOLD"
@@ -22,6 +30,8 @@ export interface RankedStats {
     winRate: number;
 }
 
+
+// This is the shape of the response from GET /summoner/:gameName/:tagLine
 export interface SummonerProfileResponse {
     account: {
         gameName: string;
@@ -32,7 +42,7 @@ export interface SummonerProfileResponse {
         level: number;
         profileIconId: number;
         // Full URL ready to use in an <img> tag //
-        profileIconUrl: string;
+        profileIconUrl: string;     // missing from route response, will fix later //
     };
     ranked: {
         soloQueue: RankedStats | null;
