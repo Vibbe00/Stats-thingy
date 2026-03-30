@@ -1,11 +1,19 @@
 import { Router } from "express";
 import { riotClient } from "../riot/client";
+import { LeagueEntry } from "../riot/types";
 
 const router = Router();
 
+function rankedStats(entry: LeagueEntry) {
+    return {
+        ...entry,
+        winRate: entry.wins / (entry.wins + entry.losses)
+    }
+}
+
 // GET /summoner/:gameName/:tagLine
 // Example: /summoner/Faker/KR1
-// Returns summoner profile + ranked stats in one shot
+// Returns summoner profile + ranked stats
 router.get("/:gameName/:tagLine", async (req, res, next) => {
     try {
         const { gameName, tagLine } = req.params;
@@ -39,8 +47,8 @@ router.get("/:gameName/:tagLine", async (req, res, next) => {
                 profileIconUrl: `https://ddragon.leagueoflegends.com/cdn/14.24.1/img/profileicon/${summoner.profileIconId}.png`,
             },
             ranked: {
-                soloQueue,
-                flexQueue,
+                soloQueue: soloQueue ? rankedStats(soloQueue) : null,
+                flexQueue: flexQueue ? rankedStats(flexQueue) : null,
             },
         });
     } catch (err) {
