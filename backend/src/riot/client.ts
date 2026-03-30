@@ -3,7 +3,6 @@ import { redis } from "../cache/redis";
 import type { RiotAccount, Summoner, LeagueEntry, Match } from "./types";
 
 // Dev key limits: 20 req/s, 100 req/2min
-// We stay conservative: 1 request per 60ms (~16/s)
 const REQUEST_INTERVAL_MS = 60;
 
 class RiotClient {
