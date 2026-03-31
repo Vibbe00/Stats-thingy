@@ -69,7 +69,13 @@ a {
   font-weight: 600;
 }
 
-hr {
+.hr1 {
+  color: white !important;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.hr2 {
   color: white !important;
   width: 100%;
 }

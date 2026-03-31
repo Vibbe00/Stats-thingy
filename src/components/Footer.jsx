@@ -6,6 +6,7 @@ export default function Footer(){
         
             <div className = "footer">
                 <div className ="section-padding">
+                    <hr className = "hr1"></hr>
                     <div className ="footer-links">
                         <div className ="footer-links-div">
                             <h4>League Data</h4>
@@ -29,7 +30,7 @@ export default function Footer(){
                             <p>tekstiä</p>
                         </div>
                     </div>
-            <hr></hr>
+            <hr className = "hr2"></hr>
             <div className="footer-below">
                 <div className ="footer-copyright">
                     <p>@{new Date().getFullYear()} LeagueData. All right reserved.</p>

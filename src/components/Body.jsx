@@ -1,10 +1,10 @@
 import './body.css';
 
-export default function Body(){
+export default function Body({children}){
 
     return(
-        <div className="body-div">
-            
-        </div>
+        <>
+        <div className="body-div">{children}</div>
+        </>
     )
 }

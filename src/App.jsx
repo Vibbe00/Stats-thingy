@@ -1,4 +1,4 @@
-import { useState } from "react";
+
 import Navbar from "./components/Navbar";
 import Body from "./components/Body";
 import Footer from "./components/Footer";
@@ -18,13 +18,16 @@ function App() {
     <>
       <Header/>
       <Navbar/>
+
+      <Body>
       <Routes>
-        <Route path="/" element = {<Home />}/>
-        <Route path="/champions" element = {<Champions />}/>
-        <Route path="/joo" element = {<Joo />}/>
-        <Route path="/juu" element = {<Juu />}/>
-      </Routes>
-      <Body/>
+          <Route path="/" element = {<Home />}/>
+          <Route path="/champions" element = {<Champions />}/>
+          <Route path="/joo" element = {<Joo />}/>
+          <Route path="/juu" element = {<Juu />}/>
+        </Routes>
+      </Body>
+
       <Footer/>
       
       
