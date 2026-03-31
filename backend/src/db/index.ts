@@ -1,7 +1,10 @@
 import { Pool } from 'pg';
 import { config } from '../config';
 
-export const db = new Pool ({ connectionString: config.databaseUrl });
+export const db = new Pool({
+  connectionString: config.databaseUrl,
+  ssl: { rejectUnauthorized: false }
+});
 
 db.on('error', (err) => {
     console.error("[DB] Unexpected pool error:", err.message);
