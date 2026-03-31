@@ -58,6 +58,36 @@ export interface SummonerProfileResponse {
 
 // WORKING BITS ARE ABOVE, BELOW IS NEW STUFF COMING LATER
 
+export interface MatchPlayerSummary {
+    championName: string;
+    championId: number;
+    kills: number;
+    deaths: number;
+    assists: number;
+    kda: number;
+    win: boolean;
+    damageDealt: number;
+    goldEarned: number;
+    visionScore: number;
+    cs: number;
+}
+
+export interface MatchSummary {
+    matchId: string;
+    gameMode: string;
+    queueId: QueueId;
+    // Duration in seconds //
+    gameDuration: number;
+    // ISO timestamp string //
+    gameStart: string;
+    // The queried player's stats in this match //
+    player: MatchPlayerSummary;
+}
+
+export interface MatchHistoryResponse {
+    matches: MatchSummary[];
+}
+
 
 
 export interface ApiError {
