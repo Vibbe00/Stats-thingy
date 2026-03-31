@@ -43,7 +43,8 @@ export interface MatchParticipant {
     totalDamageDealtToChampions: number;
     goldEarned: number;
     visionScore: number;
-    cs: number; // totalMinionsKilled + neutralMinionsKilled
+    totalMinionsKilled: number;
+    neutralMinionsKilled: number;
 }
 
 export interface Match {
@@ -51,6 +52,7 @@ export interface Match {
     info: {
         gameId: number;
         gameMode: string;
+        queueId: number;
         gameDuration: number; // seconds
         gameStartTimestamp: number;
         participants: MatchParticipant[];

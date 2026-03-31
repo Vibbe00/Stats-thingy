@@ -1,0 +1,10 @@
+Endpoints
+
+GET /summoner/:gameName/:tagLine
+Returns: SummonerProfileResponse
+
+GET /summoner/:gameName/:tagLine/matches?count=20
+Returns: MatchHistoryResponse
+
+Supported queues: Normal Draft (400), Ranked Solo/Duo (420), Ranked Flex (440)
+Default count: 20, max: 50

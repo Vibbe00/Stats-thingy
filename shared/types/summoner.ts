@@ -4,7 +4,7 @@
 // EXAMPLE USAGE:
 // const [summoner, setSummoner] = useState(null);
 //
-//async function searchSummoner(gameName, tagLine) {
+//  async function searchSummoner(gameName, tagLine) {
 //  const res = await fetch(`http://localhost:3000/summoner/${gameName}/${tagLine}`);
 //  const data = await res.json();
 //  setSummoner(data);
@@ -18,6 +18,12 @@ export type Tier =
 export type Rank = "I" | "II" | "III" | "IV";
 
 export type QueueType = "RANKED_SOLO_5x5" | "RANKED_FLEX_SR";
+
+// Supported queue IDs:
+// 400 = draft
+// 420 = ranked solo/duo
+// 440 = ranked flex
+export type QueueId = 400 | 420 | 440;
 
 export interface RankedStats {
     queueType: QueueType;
