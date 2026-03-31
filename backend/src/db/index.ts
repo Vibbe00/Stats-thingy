@@ -1,6 +1,10 @@
 import { Pool } from 'pg';
 import { config } from '../config';
 
+import dns from "dns";
+
+dns.setDefaultResultOrder("ipv4first");
+
 export const db = new Pool ({ connectionString: config.databaseUrl });
 
 db.on('error', (err) => {
