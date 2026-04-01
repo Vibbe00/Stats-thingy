@@ -50,7 +50,6 @@ export async function storeMatch(match: Match): Promise<void> {
             [
                 metadata.matchId,
                 p.puuid,
-                p.summonerName,
                 p.championName,
                 p.championId,
                 p.teamId,

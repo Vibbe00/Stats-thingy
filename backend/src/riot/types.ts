@@ -32,7 +32,6 @@ export interface MatchMetadata {
 
 export interface MatchParticipant {
     puuid: string;
-    summonerName: string;
     championName: string;
     championId: number;
     teamId: number;
