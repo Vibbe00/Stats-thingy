@@ -6,6 +6,7 @@ import { errorHandler } from './middleware/errorHandler';
 import summonerRouter from './routes/summoner';
 import matchesRouter from './routes/matches';
 import championsRouter from './routes/champions';
+import rankedRouter from './routes/ranked';
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.get('/health', (_req, res) => {
 app.use("/summoner", summonerRouter);
 app.use("/summoner", matchesRouter);
 app.use("/summoner", championsRouter);
+app.use("/summoner", rankedRouter);
 
 app.use(errorHandler);
 

@@ -86,6 +86,22 @@ export interface MatchHistoryResponse {
     matches: MatchSummary[];
 }
 
+export interface RankedQueueStats {
+  tier: Tier;
+  rank: Rank;
+  leaguePoints: number;
+  wins: number;
+  losses: number;
+  /** Computed by backend: wins / (wins + losses) */
+  winRate: number;
+  hotStreak: boolean;
+}
+ 
+export interface RankedResponse {
+  soloQueue: RankedQueueStats | null;
+  flexQueue: RankedQueueStats | null;
+}
+
 export interface ChampionStats {
   championName: string;
   championId: number;
