@@ -44,7 +44,7 @@ router.get("/:gameName/:tagLine", async (req, res, next) => {
             summoner: {
                 level: summoner.summonerLevel,
                 profileIconId: summoner.profileIconId,
-                profileIconUrl: `https://ddragon.leagueoflegends.com/cdn/14.24.1/img/profileicon/${summoner.profileIconId}.png`,
+                profileIconUrl: `https://ddragon.leagueoflegends.com/cdn/16.7.1/img/profileicon/${summoner.profileIconId}.png`,
             },
             ranked: {
                 soloQueue: soloQueue ? rankedStats(soloQueue) : null,
