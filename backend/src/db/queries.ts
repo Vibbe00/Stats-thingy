@@ -113,14 +113,14 @@ export async function getChampionStats(puuid: string) {
             ROUND(AVG(mp.deaths)::numeric, 2) AS avg_deaths,
             ROUND(AVG(mp.assists)::numeric, 2) AS avg_assists,
             ROUND(AVG(mp.cs)::numeric, 1) AS avg_cs,
-            ROUND(AVG(mp.damage_dealt)::numeric, 0) AS avg_damage,
+            ROUND(AVG(mp.damage_dealt)::numeric, 0) AS avg_damage
         FROM match_participants mp
         JOIN matches m ON m.match_id = mp.match_id
         WHERE mp.puuid = $1
-            AND m.queue_id = ANY($2)
+        AND m.queue_id = ANY($2)
         GROUP BY mp.champion_name, mp.champion_id
         ORDER BY games_played DESC`,
         [puuid, SUPPORTED_QUEUES]
-    );
-    return result.rows;
+  );
+  return result.rows;
 }

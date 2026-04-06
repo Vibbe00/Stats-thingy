@@ -5,6 +5,7 @@ import { connectDB } from './db';
 import { errorHandler } from './middleware/errorHandler';
 import summonerRouter from './routes/summoner';
 import matchesRouter from './routes/matches';
+import championsRouter from './routes/champions';
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.get('/health', (_req, res) => {
 
 app.use("/summoner", summonerRouter);
 app.use("/summoner", matchesRouter);
+app.use("/summoner", championsRouter);
 
 app.use(errorHandler);
 
