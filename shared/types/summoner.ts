@@ -56,8 +56,6 @@ export interface SummonerProfileResponse {
     };
 }
 
-// WORKING BITS ARE ABOVE, BELOW IS NEW STUFF COMING LATER
-
 export interface MatchPlayerSummary {
     championName: string;
     championId: number;
@@ -88,7 +86,24 @@ export interface MatchHistoryResponse {
     matches: MatchSummary[];
 }
 
-
+export interface ChampionStats {
+  championName: string;
+  championId: number;
+  gamesPlayed: number;
+  wins: number;
+  losses: number;
+  winRate: number;
+  avgKills: number;
+  avgDeaths: number;
+  avgAssists: number;
+  avgKda: number;
+  avgCs: number;
+  avgDamage: number;
+}
+ 
+export interface ChampionStatsResponse {
+  champions: ChampionStats[];
+}
 
 export interface ApiError {
     error: string;
