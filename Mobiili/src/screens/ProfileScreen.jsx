@@ -39,8 +39,7 @@ export default function ProfileScreen() {
     if (!trimmed) return;
 
     // Parse "Name#TAG" — default tag to your region if omitted
-    const [gameName, tagLine = process.env.EXPO_PUBLIC_RIOT_REGION?.toUpperCase() ?? 'EUW'] =
-      trimmed.split('#');
+    const [gameName, tagLine = 'EUW'] = trimmed.split('#');
 
     if (!gameName) {
       setError('Enter a Riot ID like: Faker#KR1');
