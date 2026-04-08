@@ -20,7 +20,7 @@ app.use("/summoner", summonerRouter);
 app.use(errorHandler);
 
 async function start() {
-    await connectDB();
+    //await connectDB();
     app.listen(config.port, () => {
         console.log(`[Server] Running on http://localhost:${config.port}`);
     });
