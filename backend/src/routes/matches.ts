@@ -15,7 +15,7 @@ router.get("/:gameName/:tagLine/matches", async (req, res, next) => {
         const { puuid } = account;
 
         // Fetch latest matches from Riot, filtered to only include draft, solo/duo, and flex.
-        const matchIds = await riotClient.getMatchIds(puuid, count);
+        const matchIds = await riotClient.getMatchIds(puuid, count, [400, 420, 440]);
 
         // Fetch and store any new matches
         for (const matchId of matchIds) {
