@@ -2,6 +2,7 @@ import { Router } from "express";
 import { riotClient } from "../riot/client";
 import { LeagueEntry } from "../riot/types";
 import { getDDragonVersion, profileIconUrl } from "../middleware/dataDragon";
+import { upsertSummoner } from "../db/queries";
 
 const router = Router();
 
@@ -18,22 +19,26 @@ function rankedStats(entry: LeagueEntry) {
 router.get("/:gameName/:tagLine", async (req, res, next) => {
     try {
         const { gameName, tagLine } = req.params;
-
         const version = await getDDragonVersion();
-
         // Resolve Riot account (gives us puuid)
         const account = await riotClient.getAccountByRiotId(gameName, tagLine);
-
         // Get summoner details (level, icon, etc.)
         const summoner = await riotClient.getSummonerByPuuid(account.puuid);
-
         // Get ranked entries
         const leagueEntries = await riotClient.getLeagueEntries(account.puuid);
+
+        // Store/update summoner in DB
+        await upsertSummoner(
+            account.puuid,
+            account.gameName,
+            account.tagLine,
+            summoner.summonerLevel,
+            summoner.profileIconId
+        );
 
         const soloQueue = leagueEntries.find(
             (e) => e.queueType === "RANKED_SOLO_5x5"
         ) ?? null;
-
         const flexQueue = leagueEntries.find(
             (e) => e.queueType === "RANKED_FLEX_SR"
         ) ?? null;
