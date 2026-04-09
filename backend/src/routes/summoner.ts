@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { riotClient } from "../riot/client";
 import { LeagueEntry } from "../riot/types";
+import { getDDragonVersion, profileIconUrl } from "../middleware/dataDragon";
 
 const router = Router();
 
@@ -17,6 +18,8 @@ function rankedStats(entry: LeagueEntry) {
 router.get("/:gameName/:tagLine", async (req, res, next) => {
     try {
         const { gameName, tagLine } = req.params;
+
+        const version = await getDDragonVersion();
 
         // Resolve Riot account (gives us puuid)
         const account = await riotClient.getAccountByRiotId(gameName, tagLine);
@@ -44,7 +47,7 @@ router.get("/:gameName/:tagLine", async (req, res, next) => {
             summoner: {
                 level: summoner.summonerLevel,
                 profileIconId: summoner.profileIconId,
-                profileIconUrl: `https://ddragon.leagueoflegends.com/cdn/16.7.1/img/profileicon/${summoner.profileIconId}.png`,
+                profileIconUrl: profileIconUrl(summoner.profileIconId, version),
             },
             ranked: {
                 soloQueue: soloQueue ? rankedStats(soloQueue) : null,
