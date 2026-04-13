@@ -70,7 +70,7 @@ export async function storeMatch(match: Match): Promise<void> {
 const SUPPORTED_QUEUES = [400, 420, 440];
 
 // Get stored matches
-export async function getStoredMatches(puuid: string, count: number) {
+export async function getStoredMatches(puuid: string, count: number, queues = SUPPORTED_QUEUES) {
     const result = await db.query(
         `SELECT
             m.match_id,
@@ -94,7 +94,7 @@ export async function getStoredMatches(puuid: string, count: number) {
         WHERE m.queue_id = ANY($2)
         ORDER BY m.game_start DESC
         LIMIT $3`,
-        [puuid, SUPPORTED_QUEUES, count]
+        [puuid, queues, count]
     );
     return result.rows;
 }
