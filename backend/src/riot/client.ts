@@ -3,7 +3,6 @@ import { redis } from "../cache/redis";
 import type { RiotAccount, Summoner, LeagueEntry, Match } from "./types";
 
 // Dev key limits: 20 req/s, 100 req/2min
-// We stay conservative: 1 request per 60ms (~16/s)
 const REQUEST_INTERVAL_MS = 60;
 
 class RiotClient {
@@ -71,13 +70,15 @@ class RiotClient {
         return data;
     }
 
-    async getMatchIds(puuid: string, count = 10): Promise<string[]> {
-        const cacheKey = `matchids:${puuid}:${count}`;
+    async getMatchIds(puuid: string, count = 20, queues?: number[]): Promise<string[]> {
+        const queueParams = queues?.map(q => `&queue=${q}`).join("") ?? "";
+        const cacheKey = `matchids:${puuid}:${count}:${queueParams}`;
         const cached = await redis.get(cacheKey);
         if (cached) return JSON.parse(cached);
 
+        const queryString = [`count=${count}`, queueParams].filter(Boolean).join("&");
         const data = await this.riotFetch<string[]>(
-            `https://${config.riot.regionGroup}.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?count=${count}`
+            `https://${config.riot.regionGroup}.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?${queryString}`
         );
 
         await redis.set(cacheKey, JSON.stringify(data), "EX", 60);
