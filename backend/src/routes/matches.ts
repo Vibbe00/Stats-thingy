@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { riotClient } from "../riot/client";
 import { storeMatch, getStoredMatches } from "../db/queries";
+import { getDDragonVersion, itemIconUrl, championIconUrl } from "../middleware/dataDragon";
 
 const router = Router();
 
@@ -12,7 +13,7 @@ const QUEUE_MAP: Record <string, number> = {
 
 const ALL_QUEUES = [400, 420, 440];
 
-// get /summoner/:gameName/:tagLine/matches?count=20
+// get /summoner/:gameName/:tagLine/matches?count=20&queue=solo/flex/draft
 router.get("/:gameName/:tagLine/matches", async (req, res, next) => {
     try {
         const { gameName, tagLine } = req.params;
@@ -37,6 +38,7 @@ router.get("/:gameName/:tagLine/matches", async (req, res, next) => {
         }
 
         // Return stored matches
+        const version = await getDDragonVersion();
         const rows = await getStoredMatches(puuid, count, queues);
 
         const matches = rows.map((row) => ({
@@ -48,6 +50,7 @@ router.get("/:gameName/:tagLine/matches", async (req, res, next) => {
             player: {
                 championName: row.champion_name,
                 championId: row.champion_id,
+                championIcon: championIconUrl(row.champion_name, version),
                 kills: row.kills,
                 deaths: row.deaths,
                 assists: row.assists,
@@ -59,6 +62,8 @@ router.get("/:gameName/:tagLine/matches", async (req, res, next) => {
                 goldEarned: row.gold_earned,
                 visionScore: row.vision_score,
                 cs: row.cs,
+                items: [row.item0, row.item1, row.item2, row.item3, row.item4, row.item5, row.item6]
+                    .map((id) => ({ id, icon: itemIconUrl(id, version)  }))
             },
         }));
 

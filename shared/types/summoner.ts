@@ -36,6 +36,10 @@ export interface RankedStats {
     winRate: number;
 }
 
+export interface Itemslot {
+    id: number;
+    icon: string | null;
+}
 
 // This is the shape of the response from GET /summoner/:gameName/:tagLine
 export interface SummonerProfileResponse {
@@ -59,6 +63,7 @@ export interface SummonerProfileResponse {
 export interface MatchPlayerSummary {
     championName: string;
     championId: number;
+    championIcon: string;
     kills: number;
     deaths: number;
     assists: number;
@@ -68,6 +73,7 @@ export interface MatchPlayerSummary {
     goldEarned: number;
     visionScore: number;
     cs: number;
+    items: Itemslot[];
 }
 
 export interface MatchSummary {

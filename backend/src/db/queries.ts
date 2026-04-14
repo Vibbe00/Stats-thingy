@@ -44,8 +44,8 @@ export async function storeMatch(match: Match): Promise<void> {
     for (const p of info.participants) {
         const cs = p.totalMinionsKilled + p.neutralMinionsKilled;
         await db.query(
-            `INSERT INTO match_participants (match_id, puuid, champion_name, champion_id, team_id, kills, deaths, assists, win, damage_dealt, gold_earned, vision_score, cs)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+            `INSERT INTO match_participants (match_id, puuid, champion_name, champion_id, team_id, kills, deaths, assists, win, damage_dealt, gold_earned, vision_score, cs, item0, item1, item2, item3, item4, item5, item6)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
             ON CONFLICT (match_id, puuid) DO NOTHING`,
             [
                 metadata.matchId,
@@ -60,7 +60,14 @@ export async function storeMatch(match: Match): Promise<void> {
                 p.totalDamageDealtToChampions,
                 p.goldEarned,
                 p.visionScore,
-                cs
+                cs,
+                p.item0,
+                p.item1,
+                p.item2,
+                p.item3,
+                p.item4,
+                p.item5,
+                p.item6
             ]
         );
     }
@@ -87,7 +94,8 @@ export async function getStoredMatches(puuid: string, count: number, queues = SU
             mp.damage_dealt,
             mp.gold_earned,
             mp.vision_score,
-            mp.cs
+            mp.cs,
+            mp.item0, mp.item1, mp.item2, mp.item3, mp.item4, mp.item5, mp.item6
         FROM matches m
         JOIN match_participants mp
             ON m.match_id = mp.match_id AND mp.puuid = $1
