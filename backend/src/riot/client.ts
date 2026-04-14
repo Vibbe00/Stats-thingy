@@ -71,7 +71,7 @@ class RiotClient {
     }
 
     async getMatchIds(puuid: string, count = 20, queues?: number[]): Promise<string[]> {
-        const queueParams = queues?.map(q => `queue=${q}`).join("") ?? "";
+        const queueParams = queues?.map(q => `queue=${q}`).join("&") ?? "";
         const cacheKey = `matchids:${puuid}:${count}:${queueParams}`;
         const cached = await redis.get(cacheKey);
         if (cached) return JSON.parse(cached);

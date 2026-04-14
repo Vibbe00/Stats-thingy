@@ -3,7 +3,7 @@ Endpoints
 GET /summoner/:gameName/:tagLine
 Returns: SummonerProfileResponse
 
-GET /summoner/:gameName/:tagLine/matches?count=20
+GET /summoner/:gameName/:tagLine/matches?count=20&queue=solo        //You can use this without the ?count or ?queue or with just one of those
 Returns: MatchHistoryResponse
 
 GET /summoner/:gameName/:tagLine/champions
