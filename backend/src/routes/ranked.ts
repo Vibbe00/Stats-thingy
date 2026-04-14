@@ -9,8 +9,9 @@ router.get("/:gameName/:tagLine/ranked", async (req, res, next) => {
     try {
         const { gameName, tagLine } = req.params;
 
-        const account = await riotClient.getAccountByRiotId(gameName, tagLine);
-        const entries = await riotClient.getLeagueEntries(account.puuid);
+        const region = res.locals.region;
+        const account = await riotClient.getAccountByRiotId(gameName, tagLine, region);
+        const entries = await riotClient.getLeagueEntries(account.puuid, region);
 
         const soloQueue = entries.find((e) => e.queueType === "RANKED_SOLO_5x5") ?? null;
         const flexQueue = entries.find((e) => e.queueType === "RANKED_FLEX_SR") ?? null;

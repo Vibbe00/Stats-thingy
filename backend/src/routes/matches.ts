@@ -24,16 +24,18 @@ router.get("/:gameName/:tagLine/matches", async (req, res, next) => {
             ? [QUEUE_MAP[queueParam]]
             : ALL_QUEUES;
 
+        const region = res.locals.region;
+
         // Resolve puuid
-        const account = await riotClient.getAccountByRiotId(gameName, tagLine);
+        const account = await riotClient.getAccountByRiotId(gameName, tagLine, region);
         const { puuid } = account;
 
         // Fetch latest matches from Riot, filtered to only include draft, solo/duo, and flex.
-        const matchIds = await riotClient.getMatchIds(puuid, count, queues);
+        const matchIds = await riotClient.getMatchIds(puuid, region, count, queues);
 
         // Fetch and store any new matches
         for (const matchId of matchIds) {
-            const match = await riotClient.getMatch(matchId);
+            const match = await riotClient.getMatch(matchId, region);
             await storeMatch(match);
         }
 

@@ -1,5 +1,32 @@
 import { db, connectDB } from "../db";
 import { riotClient } from "../riot/client";
+import { getRegion, type RegionConfig } from "../middleware/regions";
+
+const PLATFORM_TO_REGION: Record<string, string> = {
+    EUW1: "euw",
+    EUN1: "eune",
+    NA1:  "na",
+    BR1:  "br",
+    LA1:  "lan",
+    LA2:  "las",
+    KR:   "kr",
+    JP1:  "jp",
+    TR1:  "tr",
+    RU:   "ru",
+    OC1:  "oce",
+    PH2:  "ph",
+    SG2:  "sg",
+    TH2:  "th",
+    TW2:  "tw",
+    VN2:  "vn",
+};
+
+function regionFromMatchId(matchId: string): RegionConfig {
+    const platform = matchId.split("_")[0];
+    const key = PLATFORM_TO_REGION[platform];
+    if (!key) throw new Error(`Unknown platform in match ID: ${platform}`);
+    return getRegion(key)!;
+}
 
 async function backfill() {
     await connectDB();
@@ -15,7 +42,8 @@ async function backfill() {
     for (let i = 0; i < rows.length; i++) {
         const matchId = rows[i].match_id;
         try {
-            const match = await riotClient.getMatch(matchId);
+            const region = regionFromMatchId(matchId);
+            const match = await riotClient.getMatch(matchId, region);
 
             for (const p of match.info.participants) {
                 await db.query(

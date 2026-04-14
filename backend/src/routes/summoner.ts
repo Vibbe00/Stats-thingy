@@ -20,12 +20,14 @@ router.get("/:gameName/:tagLine", async (req, res, next) => {
     try {
         const { gameName, tagLine } = req.params;
         const version = await getDDragonVersion();
+
+        const region = res.locals.region;
         // Resolve Riot account (gives us puuid)
-        const account = await riotClient.getAccountByRiotId(gameName, tagLine);
+        const account = await riotClient.getAccountByRiotId(gameName, tagLine, region);
         // Get summoner details (level, icon, etc.)
-        const summoner = await riotClient.getSummonerByPuuid(account.puuid);
+        const summoner = await riotClient.getSummonerByPuuid(account.puuid, region);
         // Get ranked entries
-        const leagueEntries = await riotClient.getLeagueEntries(account.puuid);
+        const leagueEntries = await riotClient.getLeagueEntries(account.puuid, region);
 
         // Store/update summoner in DB
         await upsertSummoner(

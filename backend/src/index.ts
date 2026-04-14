@@ -3,10 +3,12 @@ import cors from 'cors';
 import { config } from './config';
 import { connectDB } from './db';
 import { errorHandler } from './middleware/errorHandler';
+import { regionResolver } from './middleware/regionResolver';
 import summonerRouter from './routes/summoner';
 import matchesRouter from './routes/matches';
 import championsRouter from './routes/champions';
 import rankedRouter from './routes/ranked';
+import { Router } from 'express';
 
 const app = express();
 
@@ -18,11 +20,13 @@ app.get('/health', (_req, res) => {
     res.json({ status: 'ok' });
 });
 
-app.use("/summoner", summonerRouter);
-app.use("/summoner", matchesRouter);
-app.use("/summoner", championsRouter);
-app.use("/summoner", rankedRouter);
+const regionRouter = Router();
+regionRouter.use("/summoner", summonerRouter);
+regionRouter.use("/summoner", matchesRouter);
+regionRouter.use("/summoner", championsRouter);
+regionRouter.use("/summoner", rankedRouter);
 
+app.use("/:region", regionResolver, regionRouter);
 app.use(errorHandler);
 
 async function start() {

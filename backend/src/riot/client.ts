@@ -1,5 +1,6 @@
 import { config } from "../config";
 import { redis } from "../cache/redis";
+import type { RegionConfig } from "../middleware/regions";
 import type { RiotAccount, Summoner, LeagueEntry, Match } from "./types";
 
 // Dev key limits: 20 req/s, 100 req/2min
@@ -31,67 +32,67 @@ class RiotClient {
         return res.json() as Promise<T>;
     }
 
-    async getAccountByRiotId(gameName: string, tagLine: string): Promise<RiotAccount> {
-        const cacheKey = `account:${gameName}:${tagLine}`.toLowerCase();
+    async getAccountByRiotId(gameName: string, tagLine: string, region: RegionConfig): Promise<RiotAccount> {
+        const cacheKey = `account:${region.regional}:${gameName}:${tagLine}`.toLowerCase();
         const cached = await redis.get(cacheKey);
         if (cached) return JSON.parse(cached);
 
         const data = await this.riotFetch<RiotAccount>(
-            `https://${config.riot.regionGroup}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`
+            `https://${region.regional}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`
         );
 
         await redis.set(cacheKey, JSON.stringify(data), "EX", 300);
         return data;
     }
 
-    async getSummonerByPuuid(puuid: string): Promise<Summoner> {
-        const cacheKey = `summoner:puuid:${puuid}`;
+    async getSummonerByPuuid(puuid: string, region: RegionConfig): Promise<Summoner> {
+        const cacheKey = `summoner:${region.platform}:${puuid}`;
         const cached = await redis.get(cacheKey);
         if (cached) return JSON.parse(cached);
 
         const data = await this.riotFetch<Summoner>(
-            `https://${config.riot.region}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}`
+            `https://${region.platform}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}`
         );
 
         await redis.set(cacheKey, JSON.stringify(data), "EX", 300);
         return data;
     }
 
-    async getLeagueEntries(puuid: string): Promise<LeagueEntry[]> {
-        const cacheKey = `league:${puuid}`;
+    async getLeagueEntries(puuid: string, region: RegionConfig): Promise<LeagueEntry[]> {
+        const cacheKey = `league:${region.platform}:${puuid}`;
         const cached = await redis.get(cacheKey);
         if (cached) return JSON.parse(cached);
 
         const data = await this.riotFetch<LeagueEntry[]>(
-            `https://${config.riot.region}.api.riotgames.com/lol/league/v4/entries/by-puuid/${puuid}`
+            `https://${region.platform}.api.riotgames.com/lol/league/v4/entries/by-puuid/${puuid}`
         );
 
         await redis.set(cacheKey, JSON.stringify(data), "EX", 120);
         return data;
     }
 
-    async getMatchIds(puuid: string, count = 20, queues?: number[]): Promise<string[]> {
+    async getMatchIds(puuid: string, region: RegionConfig, count = 20, queues?: number[]): Promise<string[]> {
         const queueParams = queues?.map(q => `queue=${q}`).join("&") ?? "";
-        const cacheKey = `matchids:${puuid}:${count}:${queueParams}`;
+        const cacheKey = `matchids:${region.regional}:${puuid}:${count}:${queueParams}`;
         const cached = await redis.get(cacheKey);
         if (cached) return JSON.parse(cached);
 
         const queryString = [`count=${count}`, queueParams].filter(Boolean).join("&");
         const data = await this.riotFetch<string[]>(
-            `https://${config.riot.regionGroup}.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?${queryString}`
+            `https://${region.regional}.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?${queryString}`
         );
 
         await redis.set(cacheKey, JSON.stringify(data), "EX", 60);
         return data;
     }
 
-    async getMatch(matchId: string): Promise<Match> {
+    async getMatch(matchId: string, region: RegionConfig): Promise<Match> {
         const cacheKey = `match:${matchId}`;
         const cached = await redis.get(cacheKey);
         if (cached) return JSON.parse(cached);
 
         const data = await this.riotFetch<Match>(
-            `https://${config.riot.regionGroup}.api.riotgames.com/lol/match/v5/matches/${matchId}`
+            `https://${region.regional}.api.riotgames.com/lol/match/v5/matches/${matchId}`
         );
 
         await redis.set(cacheKey, JSON.stringify(data), "EX", 3600);
