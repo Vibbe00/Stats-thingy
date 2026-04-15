@@ -1,0 +1,27 @@
+.rank-card {
+    display: flex;
+    flex-direction: column;
+    color:white;
+    background-color:#1b1b1b;
+    gap:2em;
+    border-radius: 10px;
+    margin:2em;
+    
+}
+
+
+.rank-emblem {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 10px;
+}
+
+
+.rank-entry {
+display: flex;
+flex-direction: row;
+background-color: rgb(44, 44, 44);
+border-radius: 10px;
+align-items: center;
+}
+
