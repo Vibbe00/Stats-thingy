@@ -51,6 +51,9 @@ export interface MatchParticipant {
     item4: number;
     item5: number;
     item6: number; // trinket
+    teamPosition: string; // TOP, JUNGLE, MIDDLE, BOTTOM, UTILITY
+    riotIdGameName: string;
+    riotIdTagline: string;
 }
 
 export interface Match {

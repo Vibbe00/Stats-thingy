@@ -12,6 +12,9 @@ Returns: ChampionStatsResponse
 GET /:region/summoner/:gameName/:tagLine/ranked
 Returns: RankedResponse
 
+GET /:region/summoner/:gameName/:tagLine/matches/:matchId
+Returns: MatchDetailsResponse
+
 Supported queues: Normal Draft (400), Ranked Solo/Duo (420), Ranked Flex (440)
 Default count: 20, max: 50
 

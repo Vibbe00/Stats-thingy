@@ -44,8 +44,8 @@ export async function storeMatch(match: Match): Promise<void> {
     for (const p of info.participants) {
         const cs = p.totalMinionsKilled + p.neutralMinionsKilled;
         await db.query(
-            `INSERT INTO match_participants (match_id, puuid, champion_name, champion_id, team_id, kills, deaths, assists, win, damage_dealt, gold_earned, vision_score, cs, item0, item1, item2, item3, item4, item5, item6)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
+            `INSERT INTO match_participants (match_id, puuid, champion_name, champion_id, team_id, kills, deaths, assists, win, damage_dealt, gold_earned, vision_score, cs, item0, item1, item2, item3, item4, item5, item6, team_position)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
             ON CONFLICT (match_id, puuid) DO NOTHING`,
             [
                 metadata.matchId,
@@ -67,7 +67,8 @@ export async function storeMatch(match: Match): Promise<void> {
                 p.item3,
                 p.item4,
                 p.item5,
-                p.item6
+                p.item6,
+                p.teamPosition,
             ]
         );
     }
@@ -130,4 +131,36 @@ export async function getChampionStats(puuid: string) {
         [puuid, SUPPORTED_QUEUES]
   );
   return result.rows;
+}
+
+export async function getMatchDetails(matchId: string) {
+    const result = await db.query(
+        `SELECT
+            m.match_id,
+            m.game_mode,
+            m.queue_id,
+            m.game_duration,
+            m.game_start,
+            mp.puuid,
+            mp.champion_name,
+            mp.champion_id,
+            mp.team_id,
+            mp.team_position,
+            mp.kills,
+            mp.deaths,
+            mp.assists,
+            mp.win,
+            mp.damage_dealt,
+            mp.gold_earned,
+            mp.vision_score,
+            mp.cs,
+            mp.item0, mp.item1, mp.item2, mp.item3, mp.item4, mp.item5, mp.item6,
+            s.game_name, s.tag_line
+        FROM matches m
+        JOIN match_participants mp ON m.match_id = mp.match_id
+        LEFT JOIN summoners s ON mp.puuid = s.puuid
+        WHERE m.match_id = $1`,
+        [matchId]
+    );
+    return result.rows
 }

@@ -8,6 +8,7 @@ import summonerRouter from './routes/summoner';
 import matchesRouter from './routes/matches';
 import championsRouter from './routes/champions';
 import rankedRouter from './routes/ranked';
+import matchDetailsRouter from './routes/matchDetails'
 import { Router } from 'express';
 
 const app = express();
@@ -25,6 +26,7 @@ regionRouter.use("/summoner", summonerRouter);
 regionRouter.use("/summoner", matchesRouter);
 regionRouter.use("/summoner", championsRouter);
 regionRouter.use("/summoner", rankedRouter);
+regionRouter.use("/summoner", matchDetailsRouter);
 
 app.use("/:region", regionResolver, regionRouter);
 app.use(errorHandler);

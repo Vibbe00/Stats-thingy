@@ -36,7 +36,7 @@ export interface RankedStats {
     winRate: number;
 }
 
-export interface Itemslot {
+export interface ItemSlot {
     id: number;
     icon: string | null;
 }
@@ -73,7 +73,7 @@ export interface MatchPlayerSummary {
     goldEarned: number;
     visionScore: number;
     cs: number;
-    items: Itemslot[];
+    items: ItemSlot[];
 }
 
 export interface MatchSummary {
@@ -129,4 +129,38 @@ export interface ChampionStatsResponse {
 
 export interface ApiError {
     error: string;
+}
+
+export interface MatchPlayer {
+    puuid: string;
+    // null if this player hasn't been searched on the site
+    gameName: string | null;
+    tagLine: string | null;
+    championName: string;
+    championId: number;
+    championIcon: string;
+    teamPosition: "TOP" | "JUNGLE" | "MIDDLE" | "BOTTOM" | "UTILITY" | "";
+    kills: number;
+    deaths: number;
+    assists: number;
+    kda: number;
+    win: boolean;
+    damageDealt: number;
+    goldEarned: number;
+    visionScore: number;
+    cs: number;
+    items: ItemSlot[];
+}
+
+export interface MatchDetailsResponse {
+    matchId: string;
+    gameMode: string;
+    queueId: QueueId;
+    gameDuration: number;
+    gameStart: string;
+    teams: {
+        // Team 100 = Blue, Team 200 = Red, sorted: TOP → JGL → MID → BOT → SUP
+        blue: MatchPlayer[];
+        red: MatchPlayer[];
+    };
 }
