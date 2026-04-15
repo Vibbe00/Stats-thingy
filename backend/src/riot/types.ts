@@ -44,6 +44,16 @@ export interface MatchParticipant {
     visionScore: number;
     totalMinionsKilled: number;
     neutralMinionsKilled: number;
+    item0: number;
+    item1: number;
+    item2: number;
+    item3: number;
+    item4: number;
+    item5: number;
+    item6: number; // trinket
+    teamPosition: string; // TOP, JUNGLE, MIDDLE, BOTTOM, UTILITY
+    riotIdGameName: string;
+    riotIdTagline: string;
 }
 
 export interface Match {
