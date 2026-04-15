@@ -4,8 +4,8 @@
 // EXAMPLE USAGE:
 // const [summoner, setSummoner] = useState(null);
 //
-//  async function searchSummoner(gameName, tagLine) {
-//  const res = await fetch(`http://localhost:3000/summoner/${gameName}/${tagLine}`);
+//  async function searchSummoner(region, gameName, tagLine) {
+//  const res = await fetch(`http://localhost:3000/${region}/summoner/${gameName}/${tagLine}`);
 //  const data = await res.json();
 //  setSummoner(data);
 //}
@@ -133,7 +133,7 @@ export interface ApiError {
 
 export interface MatchPlayer {
     puuid: string;
-    // null if this player hasn't been searched on the site
+    // was previously null if the account hadn't been searched manually, now is null only if riot data is missing
     gameName: string | null;
     tagLine: string | null;
     championName: string;
