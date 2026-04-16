@@ -4,13 +4,8 @@
 // EXAMPLE USAGE:
 // const [summoner, setSummoner] = useState(null);
 //
-<<<<<<< HEAD
-//  async function searchSummoner(gameName, tagLine) {
-//  const res = await fetch(`http://localhost:3000/summoner/${gameName}/${tagLine}`);
-=======
 //  async function searchSummoner(region, gameName, tagLine) {
 //  const res = await fetch(`http://localhost:3000/${region}/summoner/${gameName}/${tagLine}`);
->>>>>>> origin/main
 //  const data = await res.json();
 //  setSummoner(data);
 //}
@@ -41,13 +36,10 @@ export interface RankedStats {
     winRate: number;
 }
 
-<<<<<<< HEAD
-=======
 export interface ItemSlot {
     id: number;
     icon: string | null;
 }
->>>>>>> origin/main
 
 // This is the shape of the response from GET /summoner/:gameName/:tagLine
 export interface SummonerProfileResponse {
@@ -71,10 +63,7 @@ export interface SummonerProfileResponse {
 export interface MatchPlayerSummary {
     championName: string;
     championId: number;
-<<<<<<< HEAD
-=======
     championIcon: string;
->>>>>>> origin/main
     kills: number;
     deaths: number;
     assists: number;
@@ -84,10 +73,7 @@ export interface MatchPlayerSummary {
     goldEarned: number;
     visionScore: number;
     cs: number;
-<<<<<<< HEAD
-=======
     items: ItemSlot[];
->>>>>>> origin/main
 }
 
 export interface MatchSummary {

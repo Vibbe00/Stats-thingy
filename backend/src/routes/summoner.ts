@@ -1,11 +1,8 @@
 import { Router } from "express";
 import { riotClient } from "../riot/client";
 import { LeagueEntry } from "../riot/types";
-<<<<<<< HEAD
-=======
 import { getDDragonVersion, profileIconUrl } from "../middleware/dataDragon";
 import { upsertSummoner } from "../db/queries";
->>>>>>> origin/main
 
 const router = Router();
 
@@ -57,11 +54,7 @@ router.get("/:gameName/:tagLine", async (req, res, next) => {
             summoner: {
                 level: summoner.summonerLevel,
                 profileIconId: summoner.profileIconId,
-<<<<<<< HEAD
-                profileIconUrl: `https://ddragon.leagueoflegends.com/cdn/16.7.1/img/profileicon/${summoner.profileIconId}.png`,
-=======
                 profileIconUrl: profileIconUrl(summoner.profileIconId, version),
->>>>>>> origin/main
             },
             ranked: {
                 soloQueue: soloQueue ? rankedStats(soloQueue) : null,

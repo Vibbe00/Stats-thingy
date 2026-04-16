@@ -44,8 +44,6 @@ export interface MatchParticipant {
     visionScore: number;
     totalMinionsKilled: number;
     neutralMinionsKilled: number;
-<<<<<<< HEAD
-=======
     item0: number;
     item1: number;
     item2: number;
@@ -56,7 +54,6 @@ export interface MatchParticipant {
     teamPosition: string; // TOP, JUNGLE, MIDDLE, BOTTOM, UTILITY
     riotIdGameName: string;
     riotIdTagline: string;
->>>>>>> origin/main
 }
 
 export interface Match {
