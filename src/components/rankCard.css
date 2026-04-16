@@ -5,8 +5,10 @@
     background-color:#1b1b1b;
     gap:2em;
     border-radius: 10px;
-    margin:2em;
-    
+    margin-inline: 2em;
+    border: 2px solid red;
+    align-self: flex-start;
+    width:20%;
 }
 
 
@@ -23,5 +25,12 @@ flex-direction: row;
 background-color: rgb(44, 44, 44);
 border-radius: 10px;
 align-items: center;
+padding-inline: 0.5em;
 }
 
+
+.rank-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}

@@ -2,6 +2,7 @@
 import Searchbar from "../components/SeachbarComponent"
 import { SearchResultsList } from "../components/SearchResultsList"
 import {useState} from "react"
+import "./Home.css"
 
 
 

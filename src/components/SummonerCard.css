@@ -2,29 +2,65 @@
 
 .summoner-card {
     display: flex;
-    flex-direction: row;
+    align-self: flex-start;
     align-items: center;
     background-color: rgb(44, 44, 44);
     border-radius: 10px;
     padding: 2em;
-    gap:2em;
-    width:100%;
-    justify-content: center;
-
+    margin: 2em;
+    width:20%;
+    gap: 1em;
 }
-
 
 
 .profile-icon {
     width: 100px;
     height: 100px;
     border-radius: 10%;
-    margin-bottom: 10px;
+    margin-bottom: 10px; 
+}
+
+.summoner-info {
+    display: flex;
+    align-items: center;
+    gap:0.5em;
+    
 }
 
 .summoner-name {
     color:rgb(255, 255, 255);
     font-size: 24px;
     font-weight: bold;
-    margin-bottom: 5px;
+    
+    
 }
+
+.summoner-tagline {
+    color:rgb(165, 165, 165);
+    font-size: 18px;
+    font-weight: normal;
+    
+}
+
+
+.profile-icon-wrapper {
+  position: relative;
+  width: fit-content;
+}
+
+.summoner-level {
+    position:absolute;
+    left:50%;
+    bottom:6px;
+    transform: translateX(-50%);
+    color:white;
+    background-color:#1b1b1b;
+    border-radius: 10px;
+    padding:2px 8px;
+    font-size: 12px;
+}
+
+
+
+
+

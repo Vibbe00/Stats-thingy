@@ -4,8 +4,13 @@
 // EXAMPLE USAGE:
 // const [summoner, setSummoner] = useState(null);
 //
+<<<<<<< HEAD
 //  async function searchSummoner(gameName, tagLine) {
 //  const res = await fetch(`http://localhost:3000/summoner/${gameName}/${tagLine}`);
+=======
+//  async function searchSummoner(region, gameName, tagLine) {
+//  const res = await fetch(`http://localhost:3000/${region}/summoner/${gameName}/${tagLine}`);
+>>>>>>> origin/main
 //  const data = await res.json();
 //  setSummoner(data);
 //}
@@ -36,6 +41,13 @@ export interface RankedStats {
     winRate: number;
 }
 
+<<<<<<< HEAD
+=======
+export interface ItemSlot {
+    id: number;
+    icon: string | null;
+}
+>>>>>>> origin/main
 
 // This is the shape of the response from GET /summoner/:gameName/:tagLine
 export interface SummonerProfileResponse {
@@ -59,6 +71,10 @@ export interface SummonerProfileResponse {
 export interface MatchPlayerSummary {
     championName: string;
     championId: number;
+<<<<<<< HEAD
+=======
+    championIcon: string;
+>>>>>>> origin/main
     kills: number;
     deaths: number;
     assists: number;
@@ -68,6 +84,10 @@ export interface MatchPlayerSummary {
     goldEarned: number;
     visionScore: number;
     cs: number;
+<<<<<<< HEAD
+=======
+    items: ItemSlot[];
+>>>>>>> origin/main
 }
 
 export interface MatchSummary {
@@ -123,4 +143,38 @@ export interface ChampionStatsResponse {
 
 export interface ApiError {
     error: string;
+}
+
+export interface MatchPlayer {
+    puuid: string;
+    // was previously null if the account hadn't been searched manually, now is null only if riot data is missing
+    gameName: string | null;
+    tagLine: string | null;
+    championName: string;
+    championId: number;
+    championIcon: string;
+    teamPosition: "TOP" | "JUNGLE" | "MIDDLE" | "BOTTOM" | "UTILITY" | "";
+    kills: number;
+    deaths: number;
+    assists: number;
+    kda: number;
+    win: boolean;
+    damageDealt: number;
+    goldEarned: number;
+    visionScore: number;
+    cs: number;
+    items: ItemSlot[];
+}
+
+export interface MatchDetailsResponse {
+    matchId: string;
+    gameMode: string;
+    queueId: QueueId;
+    gameDuration: number;
+    gameStart: string;
+    teams: {
+        // Team 100 = Blue, Team 200 = Red, sorted: TOP → JGL → MID → BOT → SUP
+        blue: MatchPlayer[];
+        red: MatchPlayer[];
+    };
 }

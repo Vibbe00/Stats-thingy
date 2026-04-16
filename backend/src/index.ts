@@ -3,10 +3,16 @@ import cors from 'cors';
 import { config } from './config';
 import { connectDB } from './db';
 import { errorHandler } from './middleware/errorHandler';
+import { regionResolver } from './middleware/regionResolver';
 import summonerRouter from './routes/summoner';
 import matchesRouter from './routes/matches';
 import championsRouter from './routes/champions';
 import rankedRouter from './routes/ranked';
+<<<<<<< HEAD
+=======
+import matchDetailsRouter from './routes/matchDetails'
+import { Router } from 'express';
+>>>>>>> origin/main
 
 const app = express();
 
@@ -18,11 +24,21 @@ app.get('/health', (_req, res) => {
     res.json({ status: 'ok' });
 });
 
+<<<<<<< HEAD
 app.use("/summoner", summonerRouter);
 app.use("/summoner", matchesRouter);
 app.use("/summoner", championsRouter);
 app.use("/summoner", rankedRouter);
+=======
+const regionRouter = Router();
+regionRouter.use("/summoner", summonerRouter);
+regionRouter.use("/summoner", matchesRouter);
+regionRouter.use("/summoner", championsRouter);
+regionRouter.use("/summoner", rankedRouter);
+regionRouter.use("/summoner", matchDetailsRouter);
+>>>>>>> origin/main
 
+app.use("/:region", regionResolver, regionRouter);
 app.use(errorHandler);
 
 async function start() {

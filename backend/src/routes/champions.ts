@@ -10,7 +10,12 @@ router.get("/:gameName/:tagLine/champions", async (req, res, next) => {
     try {
         const { gameName, tagLine } = req.params;
 
+<<<<<<< HEAD
         const account = await riotClient.getAccountByRiotId(gameName, tagLine);
+=======
+        const region = res.locals.region;
+        const account = await riotClient.getAccountByRiotId(gameName, tagLine, region);
+>>>>>>> origin/main
         const rows = await getChampionStats(account.puuid);
 
         if (rows.length === 0) {
