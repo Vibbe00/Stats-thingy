@@ -164,3 +164,12 @@ export async function getMatchDetails(matchId: string) {
     );
     return result.rows
 }
+
+export async function getExistingMatchIds(matchIds: string[]): Promise<Set<string>> {
+    if (matchIds.length === 0) return new Set();
+    const result = await db.query(
+        `SELECT match_id FROM matches WHERE match_id = ANY($1)`,
+        [matchIds]
+    );
+    return new Set(result.rows.map(r => r.match_id));
+}
