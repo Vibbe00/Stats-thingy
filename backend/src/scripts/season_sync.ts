@@ -20,7 +20,7 @@ if (!region) {
 
 const ALL_QUEUES = [400, 420, 440];
 const BATCH_SIZE = 100;
-const SEASON_START = undefined;
+const SEASON_START = Math.floor(new Date("2026-01-08T00:00:00Z").getTime() / 1000);
 
 async function sync() {
     await connectDB();
@@ -36,8 +36,9 @@ async function sync() {
 
     while (true) {
         const matchIds = await riotClient.getMatchIdsBatch(
-            puuid, region!, start, BATCH_SIZE, ALL_QUEUES, undefined
+            puuid, region!, start, BATCH_SIZE, undefined, SEASON_START
         );
+
 
         if (matchIds.length === 0) break;
 
