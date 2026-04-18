@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import "./SummonerCard.css"
 
-export const SummonerCard = ({ gameName, tagLine }) => {
+export const SummonerCard = ({ region, gameName, tagLine }) => {
   const [summoner, setSummoner] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -11,7 +11,7 @@ export const SummonerCard = ({ gameName, tagLine }) => {
     setLoading(true);
     setError(null);
 
-    fetch(`http://localhost:3000/summoner/${gameName}/${tagLine}`)
+    fetch(`http://localhost:3000/${region}/summoner/${gameName}/${tagLine}`)
       .then(res => {
         if (!res.ok) {
           throw new Error(`Virhe ${res.status}: ${res.statusText}`);
@@ -23,8 +23,8 @@ export const SummonerCard = ({ gameName, tagLine }) => {
       .finally(() => setLoading(false));
   }, [gameName, tagLine]);
 
-  if (loading) return <div>Ladataan...</div>;
-  if (error) return <div>Virhe: {error}</div>;
+  if (loading) return <div className="loading">Ladataan...</div>;
+  if (error) return <div className="error">Virhe: {error}</div>;
   if (!summoner) return null;
 
   return (

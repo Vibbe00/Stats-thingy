@@ -6,9 +6,10 @@
     gap:2em;
     border-radius: 10px;
     margin-inline: 2em;
-    border: 2px solid red;
     align-self: flex-start;
     width:20%;
+    width:350px;
+    
 }
 
 

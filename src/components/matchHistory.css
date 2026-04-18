@@ -1,0 +1,128 @@
+.match-history {
+    color:white;
+    
+}
+
+
+
+.champion-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin:1em;
+}
+
+
+
+
+.match-entry {
+    display: flex;
+    align-items: center;
+    padding: 0.5em 1em;
+    border-radius: 8px;
+    margin-bottom: 0.5em;
+    gap: 1em;
+}
+.match-entry.victory {
+    background-color: #28432e;
+}
+.match-entry.defeat {
+    background-color: #4e2828;
+}
+
+
+.match-header {
+    display:flex;
+    flex-direction: column;
+    margin-bottom: 5px;
+}
+
+.match-result {
+    min-width: 60px;
+    color: #aaaaaa;
+    font-size:16px;
+}
+
+.champion {
+    min-width: 100px;
+    margin-bottom: 1em;
+    font-size:16px;
+    color: white;
+    
+}
+.game-mode {
+    min-width: 80px;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    
+}
+.game-mode.victory{
+    color: #4b995c;
+}
+.game-mode.defeat{
+    color: #c0392b;
+}
+.match-duration {
+    min-width: 60px;
+    color: #aaaaaa;
+    font-size: 12px;
+}
+
+.items-and-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+
+.match-stats {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 5px;
+    
+}
+
+
+
+.divider {
+    color: #aaaaaa;
+}
+
+
+.stats {
+    font-size : 16px;
+    min-width: 80px;
+    font-weight: bold;
+}
+
+.kda {
+    min-width: 80px;
+    color: #aaaaaa;
+    font-size:12px;
+}
+
+.cs {
+    min-width: 50px;
+    color: #aaaaaa;
+    font-size:12px;
+}
+
+.items {
+    display: flex;
+    flex-direction: row;
+    gap:5px;
+    align-self: start;
+}
+.item-icon{
+    width:30px;
+    height:30px;
+    border-radius: 5px;
+}
+.empty-item {
+    width:30px;
+    height:30px;
+    background-color: #1b1b1b;
+    border-radius: 5px;
+}
+

@@ -1,5 +1,5 @@
 
 .body-div{
-    height:700px;
+    min-height:100vh;
     background-color:#1b1b1b;
 }

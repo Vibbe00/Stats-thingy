@@ -10,6 +10,7 @@
     margin: 2em;
     width:20%;
     gap: 1em;
+    min-width:350px;
 }
 
 
@@ -24,6 +25,7 @@
     display: flex;
     align-items: center;
     gap:0.5em;
+    border: red solid 1px;
     
 }
 
@@ -31,6 +33,7 @@
     color:rgb(255, 255, 255);
     font-size: 24px;
     font-weight: bold;
+    
     
     
 }
@@ -60,7 +63,21 @@
     font-size: 12px;
 }
 
+.error {
+    color: red;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 20px;
+}
 
+.loading {
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 20px;
+}
 
 
 

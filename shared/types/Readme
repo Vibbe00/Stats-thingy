@@ -1,21 +1,5 @@
 Endpoints
 
-<<<<<<< HEAD
-GET /summoner/:gameName/:tagLine
-Returns: SummonerProfileResponse
-
-GET /summoner/:gameName/:tagLine/matches?count=20
-Returns: MatchHistoryResponse
-
-GET /summoner/:gameName/:tagLine/champions
-Returns: ChampionStatsResponse
-
-GET /summoner/:gameName/:tagLine/ranked
-Returns: RankedResponse
-
-Supported queues: Normal Draft (400), Ranked Solo/Duo (420), Ranked Flex (440)
-Default count: 20, max: 50
-=======
 GET /:region/summoner/:gameName/:tagLine
 Returns: SummonerProfileResponse
 
@@ -35,4 +19,3 @@ Supported queues: Normal Draft (400), Ranked Solo/Duo (420), Ranked Flex (440)
 Default count: 20, max: 50
 
 Supported regions: euw, eune, na, br, lan, las, kr, jp, tr, ru, oce, ph, sg, th, tw, vn
->>>>>>> origin/main

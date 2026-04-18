@@ -7,7 +7,7 @@ const getRankEmblem = (tier) => {
   return `https://opgg-static.akamaized.net/images/medals_new/${tier.toLowerCase()}.png`
 }
 
-export const RankCard = ({ gameName, tagLine }) => {
+export const RankCard = ({region, gameName, tagLine }) => {
   const [ranked, setRanked] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -16,7 +16,7 @@ export const RankCard = ({ gameName, tagLine }) => {
     setLoading(true)
     setError(null)
 
-    fetch(`http://localhost:3000/summoner/${gameName}/${tagLine}/ranked`)
+    fetch(`http://localhost:3000/${region}/summoner/${gameName}/${tagLine}/ranked`)
       .then(res => {
         if (!res.ok) throw new Error(`Virhe ${res.status}: ${res.statusText}`)
         return res.json()
