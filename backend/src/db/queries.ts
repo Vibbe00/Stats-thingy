@@ -109,7 +109,7 @@ export async function getStoredMatches(puuid: string, count: number, queues = SU
 }
 
 // Get champion stats for a summoner
-export async function getChampionStats(puuid: string) {
+export async function getChampionStats(puuid: string, queues = SUPPORTED_QUEUES) {
     const result = await db.query(
         `SELECT
             mp.champion_name,
@@ -128,7 +128,7 @@ export async function getChampionStats(puuid: string) {
         AND m.queue_id = ANY($2)
         GROUP BY mp.champion_name, mp.champion_id
         ORDER BY games_played DESC`,
-        [puuid, SUPPORTED_QUEUES]
+        [puuid, queues]
   );
   return result.rows;
 }
@@ -163,4 +163,24 @@ export async function getMatchDetails(matchId: string) {
         [matchId]
     );
     return result.rows
+}
+
+export async function getExistingMatchIds(matchIds: string[]): Promise<Set<string>> {
+    if (matchIds.length === 0) return new Set();
+    const result = await db.query(
+        `SELECT match_id FROM matches WHERE match_id = ANY($1)`,
+        [matchIds]
+    );
+    return new Set(result.rows.map(r => r.match_id));
+}
+
+export async function getRecentSummoners(limit = 10) {
+    const result = await db.query(
+        `SELECT puuid, game_name, tag_line, summoner_level, profile_icon_id, updated_at
+         FROM summoners
+         ORDER BY updated_at DESC
+         LIMIT $1`,
+         [limit]
+    );
+    return result.rows;
 }
