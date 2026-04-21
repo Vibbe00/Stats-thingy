@@ -4,15 +4,28 @@ import { getChampionStats } from "../db/queries";
 
 const router = Router();
 
+const QUEUE_MAP: Record<string, number> = {
+    draft: 400,
+    solo: 420,
+    flex: 440,
+};
+
+const ALL_QUEUES = [400, 420, 440];
+
 // GET /summoner/:gameName/:tagLine/champions
 // Returns aggregated stats per champion sorted by most played
 router.get("/:gameName/:tagLine/champions", async (req, res, next) => {
     try {
         const { gameName, tagLine } = req.params;
-
         const region = res.locals.region;
+
+        const queueParam = req.query.queue as string | undefined;
+        const queues = queueParam && QUEUE_MAP[queueParam]
+            ? [QUEUE_MAP[queueParam]]
+            : ALL_QUEUES;
+
         const account = await riotClient.getAccountByRiotId(gameName, tagLine, region);
-        const rows = await getChampionStats(account.puuid);
+        const rows = await getChampionStats(account.puuid, queues);
 
         if (rows.length === 0) {
             res.json({ champions: [] });

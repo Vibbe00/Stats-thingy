@@ -6,7 +6,7 @@ Returns: SummonerProfileResponse
 GET /:region/summoner/:gameName/:tagLine/matches?count=20&queue=solo        //You can use this without the ?count or ?queue or with just one of those
 Returns: MatchHistoryResponse
 
-GET /:region/summoner/:gameName/:tagLine/champions
+GET /:region/summoner/:gameName/:tagLine/champions?queue=solo
 Returns: ChampionStatsResponse
 
 GET /:region/summoner/:gameName/:tagLine/ranked

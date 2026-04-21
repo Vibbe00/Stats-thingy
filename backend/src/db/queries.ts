@@ -109,7 +109,7 @@ export async function getStoredMatches(puuid: string, count: number, queues = SU
 }
 
 // Get champion stats for a summoner
-export async function getChampionStats(puuid: string) {
+export async function getChampionStats(puuid: string, queues = SUPPORTED_QUEUES) {
     const result = await db.query(
         `SELECT
             mp.champion_name,
@@ -128,7 +128,7 @@ export async function getChampionStats(puuid: string) {
         AND m.queue_id = ANY($2)
         GROUP BY mp.champion_name, mp.champion_id
         ORDER BY games_played DESC`,
-        [puuid, SUPPORTED_QUEUES]
+        [puuid, queues]
   );
   return result.rows;
 }
