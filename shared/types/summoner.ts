@@ -164,3 +164,16 @@ export interface MatchDetailsResponse {
         red: MatchPlayer[];
     };
 }
+
+export interface RecentSummoner {
+    gameName: string;
+    tagLine: string;
+    level: number;
+    profileIconId: number;
+    profileIconUrl: string;
+    lastSearched: string;
+}
+
+export interface RecentSummonersResponse {
+    summoners: RecentSummoner[];
+}

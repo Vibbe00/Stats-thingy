@@ -173,3 +173,14 @@ export async function getExistingMatchIds(matchIds: string[]): Promise<Set<strin
     );
     return new Set(result.rows.map(r => r.match_id));
 }
+
+export async function getRecentSummoners(limit = 10) {
+    const result = await db.query(
+        `SELECT puuid, game_name, tag_line, summoner_level, profile_icon_id, updated_at
+         FROM summoners
+         ORDER BY updated_at DESC
+         LIMIT $1`,
+         [limit]
+    );
+    return result.rows;
+}
