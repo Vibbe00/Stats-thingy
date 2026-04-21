@@ -74,6 +74,7 @@ export interface MatchPlayerSummary {
     visionScore: number;
     cs: number;
     items: ItemSlot[];
+    summonerSpells: SummonerSpell[];
 }
 
 export interface MatchSummary {
@@ -150,6 +151,7 @@ export interface MatchPlayer {
     visionScore: number;
     cs: number;
     items: ItemSlot[];
+    summonerSpells: SummonerSpell[];
 }
 
 export interface MatchDetailsResponse {
@@ -176,4 +178,9 @@ export interface RecentSummoner {
 
 export interface RecentSummonersResponse {
     summoners: RecentSummoner[];
+}
+
+export interface SummonerSpell {
+    id: number;
+    icon: string | null;
 }
