@@ -69,6 +69,8 @@ export async function storeMatch(match: Match): Promise<void> {
                 p.item5,
                 p.item6,
                 p.teamPosition,
+                p.summoner1Id,
+                p.summoner2Id,
             ]
         );
     }
@@ -96,7 +98,8 @@ export async function getStoredMatches(puuid: string, count: number, queues = SU
             mp.gold_earned,
             mp.vision_score,
             mp.cs,
-            mp.item0, mp.item1, mp.item2, mp.item3, mp.item4, mp.item5, mp.item6
+            mp.item0, mp.item1, mp.item2, mp.item3, mp.item4, mp.item5, mp.item6,
+            mp.summoner1_id, mp.summoner2_id
         FROM matches m
         JOIN match_participants mp
             ON m.match_id = mp.match_id AND mp.puuid = $1
@@ -155,7 +158,8 @@ export async function getMatchDetails(matchId: string) {
             mp.vision_score,
             mp.cs,
             mp.item0, mp.item1, mp.item2, mp.item3, mp.item4, mp.item5, mp.item6,
-            s.game_name, s.tag_line
+            s.game_name, s.tag_line,
+            mp.summoner1_id, mp.summoner2_id
         FROM matches m
         JOIN match_participants mp ON m.match_id = mp.match_id
         LEFT JOIN summoners s ON mp.puuid = s.puuid

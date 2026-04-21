@@ -54,6 +54,8 @@ export interface MatchParticipant {
     teamPosition: string; // TOP, JUNGLE, MIDDLE, BOTTOM, UTILITY
     riotIdGameName: string;
     riotIdTagline: string;
+    summoner1Id: number;
+    summoner2Id: number;
 }
 
 export interface Match {
