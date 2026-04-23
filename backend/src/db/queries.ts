@@ -26,19 +26,17 @@ export async function upsertSummoner(
 export async function storeMatch(match: Match): Promise<void> {
     const { metadata, info } = match;
 
-    // Skip
-    const existing = await db.query(
-        "SELECT match_id FROM matches WHERE match_id = $1",
-        [metadata.matchId]
-    );
-    if (existing.rows.length > 0) return;
-
-    // Insert match
-    await db.query(
+    // Insert match, skip if already exists
+    const result = await db.query(
         `INSERT INTO matches (match_id, game_mode, queue_id, game_duration, game_start)
-        VALUES ($1, $2, $3, $4, TO_TIMESTAMP($5 / 1000.0))`,
+        VALUES ($1, $2, $3, $4, TO_TIMESTAMP($5 / 1000.0))
+        ON CONFLICT (match_id) DO NOTHING
+        RETURNING match_id`,
         [metadata.matchId, info.gameMode, info.queueId, info.gameDuration, info.gameStartTimestamp]
     );
+
+    // If match exists, skip participants
+    if (result.rows.length === 0) return;
 
     // Insert participants
     for (const p of info.participants) {
@@ -132,8 +130,8 @@ export async function getChampionStats(puuid: string, queues = SUPPORTED_QUEUES)
         GROUP BY mp.champion_name, mp.champion_id
         ORDER BY games_played DESC`,
         [puuid, queues]
-  );
-  return result.rows;
+    );
+    return result.rows;
 }
 
 export async function getMatchDetails(matchId: string) {
@@ -184,7 +182,7 @@ export async function getRecentSummoners(limit = 10) {
          FROM summoners
          ORDER BY updated_at DESC
          LIMIT $1`,
-         [limit]
+        [limit]
     );
     return result.rows;
 }

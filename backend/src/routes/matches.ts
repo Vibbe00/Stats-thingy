@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { riotClient } from "../riot/client";
-import { storeMatch, getStoredMatches } from "../db/queries";
+import { storeMatch, getStoredMatches, getExistingMatchIds } from "../db/queries";
 import { getDDragonVersion, itemIconUrl, championIconUrl, summonerSpellIconUrl } from "../middleware/dataDragon";
 
 const router = Router();
@@ -34,7 +34,9 @@ router.get("/:gameName/:tagLine/matches", async (req, res, next) => {
         const matchIds = await riotClient.getMatchIds(puuid, region, count, queues);
 
         // Fetch and store any new matches
+        const existing = await getExistingMatchIds(matchIds);
         for (const matchId of matchIds) {
+            if (existing.has(matchId)) continue;
             const match = await riotClient.getMatch(matchId, region);
             await storeMatch(match);
         }
