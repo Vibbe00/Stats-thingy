@@ -38,22 +38,11 @@ export const MatchEntry = ({ match, region, gameName, tagLine }) => {
         className={`match-entry ${match.player.win ? "victory" : "defeat"}`}
         key={match.matchId}
       >
-      <div className="champion-and-spells">
         <img
           className="champion-icon"
           src={match.player.championIcon}
           alt={match.player.championName}
         ></img>
-
-        <div className="summoner-spells">
-          {match.player.summonerSpells.map((spell, index) => (
-            spell.icon
-            ? <img key={index} className="spell-icon" src={spell.icon} alt={spell.id}/>
-            : <div key={index} className="empty-spell"/>
-            ))}
-        </div>
-      </div>
-       
 
         <div className="match-header">
           <span
