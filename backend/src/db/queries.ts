@@ -42,8 +42,8 @@ export async function storeMatch(match: Match): Promise<void> {
     for (const p of info.participants) {
         const cs = p.totalMinionsKilled + p.neutralMinionsKilled;
         await db.query(
-            `INSERT INTO match_participants (match_id, puuid, champion_name, champion_id, team_id, kills, deaths, assists, win, damage_dealt, gold_earned, vision_score, cs, item0, item1, item2, item3, item4, item5, item6, team_position)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
+            `INSERT INTO match_participants (match_id, puuid, champion_name, champion_id, team_id, kills, deaths, assists, win, damage_dealt, gold_earned, vision_score, cs, item0, item1, item2, item3, item4, item5, item6, team_position, summoner1_id, summoner2_id)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)
             ON CONFLICT (match_id, puuid) DO NOTHING`,
             [
                 metadata.matchId,

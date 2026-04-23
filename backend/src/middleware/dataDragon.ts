@@ -45,7 +45,7 @@ export function championIconUrl(championName: string, version: string): string {
 }
 
 export function summonerSpellIconUrl(spellId: number, version: string): string | null {
-    if (spellId === 0) return null;
+    if (spellId === 0 || !SUMMONER_SPELL_NAMES[spellId]) return null;
     return `https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/${SUMMONER_SPELL_NAMES[spellId]}.png`;
 }
 
