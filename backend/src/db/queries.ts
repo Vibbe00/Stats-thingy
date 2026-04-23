@@ -69,6 +69,8 @@ export async function storeMatch(match: Match): Promise<void> {
                 p.item5,
                 p.item6,
                 p.teamPosition,
+                p.summoner1Id,
+                p.summoner2Id,
             ]
         );
     }
@@ -96,7 +98,8 @@ export async function getStoredMatches(puuid: string, count: number, queues = SU
             mp.gold_earned,
             mp.vision_score,
             mp.cs,
-            mp.item0, mp.item1, mp.item2, mp.item3, mp.item4, mp.item5, mp.item6
+            mp.item0, mp.item1, mp.item2, mp.item3, mp.item4, mp.item5, mp.item6,
+            mp.summoner1_id, mp.summoner2_id
         FROM matches m
         JOIN match_participants mp
             ON m.match_id = mp.match_id AND mp.puuid = $1
@@ -109,7 +112,7 @@ export async function getStoredMatches(puuid: string, count: number, queues = SU
 }
 
 // Get champion stats for a summoner
-export async function getChampionStats(puuid: string) {
+export async function getChampionStats(puuid: string, queues = SUPPORTED_QUEUES) {
     const result = await db.query(
         `SELECT
             mp.champion_name,
@@ -128,7 +131,7 @@ export async function getChampionStats(puuid: string) {
         AND m.queue_id = ANY($2)
         GROUP BY mp.champion_name, mp.champion_id
         ORDER BY games_played DESC`,
-        [puuid, SUPPORTED_QUEUES]
+        [puuid, queues]
   );
   return result.rows;
 }
@@ -155,7 +158,8 @@ export async function getMatchDetails(matchId: string) {
             mp.vision_score,
             mp.cs,
             mp.item0, mp.item1, mp.item2, mp.item3, mp.item4, mp.item5, mp.item6,
-            s.game_name, s.tag_line
+            s.game_name, s.tag_line,
+            mp.summoner1_id, mp.summoner2_id
         FROM matches m
         JOIN match_participants mp ON m.match_id = mp.match_id
         LEFT JOIN summoners s ON mp.puuid = s.puuid
@@ -163,4 +167,24 @@ export async function getMatchDetails(matchId: string) {
         [matchId]
     );
     return result.rows
+}
+
+export async function getExistingMatchIds(matchIds: string[]): Promise<Set<string>> {
+    if (matchIds.length === 0) return new Set();
+    const result = await db.query(
+        `SELECT match_id FROM matches WHERE match_id = ANY($1)`,
+        [matchIds]
+    );
+    return new Set(result.rows.map(r => r.match_id));
+}
+
+export async function getRecentSummoners(limit = 10) {
+    const result = await db.query(
+        `SELECT puuid, game_name, tag_line, summoner_level, profile_icon_id, updated_at
+         FROM summoners
+         ORDER BY updated_at DESC
+         LIMIT $1`,
+         [limit]
+    );
+    return result.rows;
 }

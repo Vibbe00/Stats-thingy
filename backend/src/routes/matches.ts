@@ -1,11 +1,11 @@
 import { Router } from "express";
 import { riotClient } from "../riot/client";
 import { storeMatch, getStoredMatches } from "../db/queries";
-import { getDDragonVersion, itemIconUrl, championIconUrl } from "../middleware/dataDragon";
+import { getDDragonVersion, itemIconUrl, championIconUrl, summonerSpellIconUrl } from "../middleware/dataDragon";
 
 const router = Router();
 
-const QUEUE_MAP: Record <string, number> = {
+const QUEUE_MAP: Record<string, number> = {
     draft: 400,
     solo: 420,
     flex: 440,
@@ -57,15 +57,18 @@ router.get("/:gameName/:tagLine/matches", async (req, res, next) => {
                 deaths: row.deaths,
                 assists: row.assists,
                 kda: parseFloat(
-                    ((row.kills + row.assists) / Math.max(1, row.deaths)).toFixed(2)
-                ),
+                    ((row.kills + row.assists) / Math.max(1, row.deaths)).toFixed(2)),
                 win: row.win,
                 damageDealt: row.damage_dealt,
                 goldEarned: row.gold_earned,
                 visionScore: row.vision_score,
                 cs: row.cs,
                 items: [row.item0, row.item1, row.item2, row.item3, row.item4, row.item5, row.item6]
-                    .map((id) => ({ id, icon: itemIconUrl(id, version)  }))
+                    .map((id) => ({ id, icon: itemIconUrl(id, version) })),
+                summonerSpells: [
+                    { id: row.summoner1_id, icon: summonerSpellIconUrl(row.summoner1_id, version) },
+                    { id: row.summoner2_id, icon: summonerSpellIconUrl(row.summoner2_id, version) },
+                ],
             },
         }));
 

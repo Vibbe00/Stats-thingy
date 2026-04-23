@@ -98,6 +98,21 @@ class RiotClient {
         await redis.set(cacheKey, JSON.stringify(data), "EX", 3600);
         return data;
     }
+
+    async getMatchIdsBatch(
+        puuid: string,
+        region: RegionConfig,
+        start: number,
+        count: number,
+        queues?: number[],
+        startTime?: number
+    ): Promise<string[]> {
+        const params = [`start=${start}`, `count=${count}`];
+        if (queues) params.push(...queues.map(q => `queue=${q}`));
+        if (startTime) params.push(`startTime=${startTime}`);
+
+        return this.riotFetch<string[]>(`https://${region.regional}.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?${params.join("&")}`);
+    }
 }
 
 export const riotClient = new RiotClient();
