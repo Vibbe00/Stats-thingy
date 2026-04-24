@@ -40,7 +40,12 @@ export function itemIconUrl(itemId: number, version: string) {
     return `https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${itemId}.png`;
 }
 
+const CHAMPION_NAME_FIXES: Record<string, string> = {
+    Fiddlesticks: "FiddleSticks",
+};
+
 export function championIconUrl(championName: string, version: string): string {
+    const name = CHAMPION_NAME_FIXES[championName] ?? championName;
     return `https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${championName}.png`;
 }
 
