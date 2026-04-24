@@ -33,8 +33,9 @@ async function backfill() {
 
     // Get all matches without items
     const { rows } = await db.query(
-        `SELECT DISTINCT match_id FROM match_participants
-        WHERE item0 = 0 AND item1 = 0 AND item2 = 0 AND item3 = 0 AND item4 = 0 AND item5 = 0 AND item6 = 0 OR team_position = '' OR team_position IS NULL OR summoner1_id = 0 OR summoner2_id = 0`
+        `SELECT DISTINCT match_id FROM match_participants WHERE (item0 = 0 AND item1 = 0 AND item2 = 0 AND item3 = 0 AND item4 = 0 AND item5 = 0 AND item6 = 0) 
+        OR team_position = '' OR team_position IS NULL
+        OR summoner1_id = 0 OR summoner2_id = 0`
     );
 
     console.log(`Found ${rows.length} matches to backfill.`);
