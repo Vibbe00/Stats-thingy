@@ -35,20 +35,20 @@ const REGIONS = [
 
 // ─── Tier config ──────────────────────────────────────────────────────────────
 const TIER_CONFIG = {
-  IRON:        { color: '#6B6B6B', bg: '#1A1A1A', label: 'Iron'        },
-  BRONZE:      { color: '#CD7F32', bg: '#1F1208', label: 'Bronze'      },
-  SILVER:      { color: '#A8A9AD', bg: '#111418', label: 'Silver'      },
-  GOLD:        { color: '#C89B3C', bg: '#1A1508', label: 'Gold'        },
-  PLATINUM:    { color: '#0AC8B9', bg: '#071A19', label: 'Platinum'    },
-  EMERALD:     { color: '#00C473', bg: '#071A0F', label: 'Emerald'     },
-  DIAMOND:     { color: '#576BCE', bg: '#080D1F', label: 'Diamond'     },
-  MASTER:      { color: '#9D48E0', bg: '#130820', label: 'Master'      },
-  GRANDMASTER: { color: '#E84057', bg: '#1F0508', label: 'Grandmaster' },
-  CHALLENGER:  { color: '#F4C874', bg: '#1A1200', label: 'Challenger'  },
+  IRON:        { color: '#6B6B6B', bg: '#1A1A1A', label: 'Iron',        emblemColor: '#6B6B6B' },
+  BRONZE:      { color: '#CD7F32', bg: '#1F1208', label: 'Bronze',      emblemColor: '#CD7F32' },
+  SILVER:      { color: '#A8A9AD', bg: '#111418', label: 'Silver',      emblemColor: '#A8A9AD' },
+  GOLD:        { color: '#C89B3C', bg: '#1A1508', label: 'Gold',        emblemColor: '#C89B3C' },
+  PLATINUM:    { color: '#0AC8B9', bg: '#071A19', label: 'Platinum',    emblemColor: '#0AC8B9' },
+  EMERALD:     { color: '#00C473', bg: '#071A0F', label: 'Emerald',     emblemColor: '#00C473' },
+  DIAMOND:     { color: '#576BCE', bg: '#080D1F', label: 'Diamond',     emblemColor: '#576BCE' },
+  MASTER:      { color: '#9D48E0', bg: '#130820', label: 'Master',      emblemColor: '#9D48E0' },
+  GRANDMASTER: { color: '#E84057', bg: '#1F0508', label: 'Grandmaster', emblemColor: '#E84057' },
+  CHALLENGER:  { color: '#F4C874', bg: '#1A1200', label: 'Challenger',  emblemColor: '#F4C874' },
 };
 
 const tierEmblemUrl = (tier) =>
-  `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/images/ranked-emblem/emblem-${tier?.toLowerCase()}.png`;
+  `https://ddragon.leagueoflegends.com/cdn/img/ranked-emblems/${tier?.charAt(0).toUpperCase() + tier?.slice(1).toLowerCase()}.png`;
 
 const QUEUE_LABELS = { 420: 'Ranked Solo', 440: 'Ranked Flex', 400: 'Normal Draft' };
 
@@ -59,17 +59,17 @@ export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
 
   const [input,         setInput]         = useState('');
-  const [region, setRegion] = useState(REGIONS[1]); // default EUNE
+  const [region,        setRegion]        = useState(REGIONS[1]); // default EUNE
   const [showPicker,    setShowPicker]    = useState(false);
   const [loading,       setLoading]       = useState(false);
   const [error,         setError]         = useState('');
   const [backendOnline, setBackendOnline] = useState(null);
 
   // Profile data
-  const [profile,       setProfile]       = useState(null);
-  const [matches,       setMatches]       = useState(null);
-  const [champions,     setChampions]     = useState(null);
-  const [activeTab,     setActiveTab]     = useState('Overview');
+  const [profile,   setProfile]   = useState(null);
+  const [matches,   setMatches]   = useState(null);
+  const [champions, setChampions] = useState(null);
+  const [activeTab, setActiveTab] = useState('Overview');
 
   useEffect(() => {
     checkBackendHealth().then(setBackendOnline);
@@ -100,7 +100,6 @@ export default function ProfileScreen() {
     setActiveTab('Overview');
 
     try {
-      // Fetch all 3 in parallel
       const [profileData, matchData, champData] = await Promise.all([
         getSummonerProfile(region.value, gameName, tagLine),
         getSummonerMatches(region.value, gameName, tagLine, 20, 'solo'),
@@ -121,7 +120,6 @@ export default function ProfileScreen() {
       style={{ flex: 1, backgroundColor: '#0A0E1A' }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      {/* Region picker modal */}
       <RegionPickerModal
         visible={showPicker}
         selected={region}
@@ -137,14 +135,11 @@ export default function ProfileScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
         <Text style={styles.title}>PROFILE</Text>
         <Text style={styles.subtitle}>Search by Riot ID</Text>
 
-        {/* Backend status */}
         <BackendStatus online={backendOnline} />
 
-        {/* Search row */}
         <View style={styles.searchRow}>
           <TouchableOpacity style={styles.regionBtn} onPress={() => setShowPicker(true)}>
             <Text style={styles.regionBtnFlag}>{region.flag}</Text>
@@ -176,20 +171,16 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Error */}
         {!!error && (
           <View style={styles.errorBox}>
             <Text style={styles.errorText}>⚠️  {error}</Text>
           </View>
         )}
 
-        {/* Results */}
         {profile && (
           <View style={{ marginTop: 8 }}>
-            {/* Profile header card */}
             <ProfileHeader profile={profile} region={region} />
 
-            {/* Tabs */}
             <View style={styles.tabBar}>
               {TABS.map((t) => (
                 <TouchableOpacity
@@ -248,7 +239,7 @@ function ProfileHeader({ profile, region }) {
   );
 }
 
-// ─── Overview Tab — ranked.soloQueue + ranked.flexQueue ───────────────────────
+// ─── Overview Tab ─────────────────────────────────────────────────────────────
 function OverviewTab({ profile }) {
   return (
     <View>
@@ -259,7 +250,7 @@ function OverviewTab({ profile }) {
   );
 }
 
-// ─── Matches Tab — MatchHistoryResponse ───────────────────────────────────────
+// ─── Matches Tab ──────────────────────────────────────────────────────────────
 function MatchesTab({ matches }) {
   if (!matches) return <LoadingBlock />;
   if (!matches.matches?.length) return <EmptyBlock text="No recent matches found" />;
@@ -274,17 +265,29 @@ function MatchesTab({ matches }) {
   );
 }
 
+// ─── CHANGED: added summoner spells next to champion icon ────────────────────
 function MatchRow({ match }) {
   const p        = match.player;
+  console.log('[spells]', JSON.stringify(p.summonerSpells));
   const duration = `${Math.floor(match.gameDuration / 60)}:${String(match.gameDuration % 60).padStart(2, '0')}`;
   const qLabel   = QUEUE_LABELS[match.queueId] ?? match.gameMode;
   const winColor = p.win ? '#4FBB82' : '#BB4F4F';
-  const winLabel = p.win ? 'WIN' : 'LOSS';
 
   return (
     <View style={[styles.matchRow, { borderLeftColor: winColor }]}>
-      {/* Champion icon */}
-      <Image source={{ uri: p.championIcon }} style={styles.matchChampIcon} />
+      {/* Champion icon + summoner spells side by side */}
+      <View style={styles.matchLeft}>
+        <Image source={{ uri: p.championIcon }} style={styles.matchChampIcon} />
+        {p.summonerSpells?.length > 0 && (
+          <View style={styles.spellsCol}>
+            {p.summonerSpells.slice(0, 2).map((spell, i) =>
+              spell.icon
+                ? <Image key={i} source={{ uri: spell.icon }} style={styles.spellIcon} />
+                : <View key={i} style={styles.spellIconEmpty} />
+            )}
+          </View>
+        )}
+      </View>
 
       {/* Middle info */}
       <View style={styles.matchInfo}>
@@ -308,7 +311,7 @@ function MatchRow({ match }) {
       {/* Win/loss + items */}
       <View style={styles.matchRight}>
         <View style={[styles.winBadge, { backgroundColor: winColor + '22', borderColor: winColor + '55' }]}>
-          <Text style={[styles.winBadgeText, { color: winColor }]}>{winLabel}</Text>
+          <Text style={[styles.winBadgeText, { color: winColor }]}>{p.win ? 'WIN' : 'LOSS'}</Text>
         </View>
         <View style={styles.itemsGrid}>
           {p.items.slice(0, 6).map((item, i) => (
@@ -322,7 +325,7 @@ function MatchRow({ match }) {
   );
 }
 
-// ─── Champions Tab — ChampionStatsResponse ────────────────────────────────────
+// ─── Champions Tab ────────────────────────────────────────────────────────────
 function ChampionsTab({ champions }) {
   if (!champions) return <LoadingBlock />;
   if (!champions.champions?.length) return <EmptyBlock text="No champion data yet — play some games first" />;
@@ -338,9 +341,8 @@ function ChampionsTab({ champions }) {
 }
 
 function ChampionRow({ champ }) {
-  // winRate from backend is 0.0–1.0 decimal
-  const wrPct    = Math.round(champ.winRate * 100);
-  const wrColor  = wrPct >= 60 ? '#4FBB82' : wrPct >= 50 ? '#C89B3C' : '#BB4F4F';
+  const wrPct   = Math.round(champ.winRate * 100);
+  const wrColor = wrPct >= 60 ? '#4FBB82' : wrPct >= 50 ? '#C89B3C' : '#BB4F4F';
 
   return (
     <View style={styles.champRow}>
@@ -348,53 +350,77 @@ function ChampionRow({ champ }) {
         <Text style={styles.champName}>{champ.championName}</Text>
         <Text style={styles.champGames}>{champ.gamesPlayed} games</Text>
       </View>
-
       <View style={styles.champMid}>
         <Text style={styles.champKda}>
           {champ.avgKills.toFixed(1)} / {champ.avgDeaths.toFixed(1)} / {champ.avgAssists.toFixed(1)}
         </Text>
         <Text style={styles.champKdaLabel}>{champ.avgKda.toFixed(2)} KDA · {champ.avgCs.toFixed(0)} CS</Text>
       </View>
-
       <View style={styles.champRight}>
         <Text style={[styles.champWr, { color: wrColor }]}>{wrPct}%</Text>
-        <Text style={styles.champWrLabel}>
-          {champ.wins}W {champ.losses}L
-        </Text>
+        <Text style={styles.champWrLabel}>{champ.wins}W {champ.losses}L</Text>
       </View>
     </View>
   );
 }
 
-// ─── Rank Card ────────────────────────────────────────────────────────────────
+// ─── Rank Card — CHANGED: emblemWrapper gives image explicit size ──────────────
 function RankCard({ title, icon, stats }) {
   if (!stats) {
     return (
       <View style={[styles.rankCard, styles.rankCardUnranked]}>
-        <Text style={styles.rankCardTitle}>{icon}  {title}</Text>
-        <Text style={styles.unrankedText}>Unranked</Text>
+        <View style={styles.emblemWrapper}>
+          {/* Empty placeholder same size so layout stays consistent */}
+          <View style={styles.emblemPlaceholder} />
+        </View>
+        <View style={styles.rankInfo}>
+          <Text style={styles.rankCardTitle}>{icon}  {title}</Text>
+          <Text style={styles.unrankedText}>Unranked</Text>
+        </View>
       </View>
     );
   }
 
-  const cfg      = TIER_CONFIG[stats.tier] ?? TIER_CONFIG.IRON;
-  // winRate is 0.0–1.0 from backend
-  const wrPct    = Math.round(stats.winRate * 100);
-  const wrColor  = wrPct >= 60 ? '#4FBB82' : wrPct >= 50 ? '#C89B3C' : '#BB4F4F';
+  const cfg     = TIER_CONFIG[stats.tier] ?? TIER_CONFIG.IRON;
+  console.log('[emblem URL]', tierEmblemUrl(stats.tier));
+  const wrPct   = Math.round(stats.winRate * 100);
+  const wrColor = wrPct >= 60 ? '#4FBB82' : wrPct >= 50 ? '#C89B3C' : '#BB4F4F';
+
+  // Master / Grandmaster / Challenger don't have I–IV ranks
+  const rankSuffix = ['MASTER', 'GRANDMASTER', 'CHALLENGER'].includes(stats.tier)
+    ? ''
+    : ` ${stats.rank}`;
 
   return (
-    <LinearGradient colors={[cfg.bg, '#0A0E1A']} style={[styles.rankCard, { borderColor: cfg.color + '55' }]}>
-      <Image source={{ uri: tierEmblemUrl(stats.tier) }} style={styles.emblem} resizeMode="contain" />
+    <LinearGradient
+      colors={[cfg.bg, '#0A0E1A']}
+      style={[styles.rankCard, { borderColor: cfg.color + '55' }]}
+    >
+      {/* Emblem — explicit 72x72 wrapper so React Native loads the image */}
+      <View style={styles.emblemWrapper}>
+        <View style={[styles.emblemGlow, { backgroundColor: cfg.color + '22' }]} />
+        <Image
+          source={{ uri: tierEmblemUrl(stats.tier) }}
+          style={styles.emblem}
+          resizeMode="contain"
+        />
+      </View>
+
       <View style={styles.rankInfo}>
         <Text style={styles.rankCardTitle}>{icon}  {title}</Text>
-        <Text style={[styles.tierText, { color: cfg.color }]}>{cfg.label} {stats.rank}</Text>
-        <Text style={[styles.lpText,   { color: cfg.color }]}>{stats.leaguePoints} LP</Text>
+        <Text style={[styles.tierText, { color: cfg.color }]}>
+          {cfg.label}{rankSuffix}
+        </Text>
+        <Text style={[styles.lpText, { color: cfg.color + 'CC' }]}>
+          {stats.leaguePoints} LP
+        </Text>
         <View style={styles.wlRow}>
           <Text style={styles.wins}>{stats.wins}W</Text>
           <Text style={styles.wlSep}> / </Text>
           <Text style={styles.losses}>{stats.losses}L</Text>
         </View>
       </View>
+
       <View style={styles.rankRight}>
         <View style={[styles.ringOuter, { borderColor: wrColor }]}>
           <Text style={[styles.ringText, { color: wrColor }]}>{wrPct}%</Text>
@@ -517,10 +543,13 @@ const styles = StyleSheet.create({
 
   sectionLabel:       { color: '#C89B3C', fontSize: 11, fontWeight: '700', letterSpacing: 2, marginBottom: 10, marginTop: 14 },
 
-  // Rank card
+  // Rank card — CHANGED: emblemWrapper replaces plain emblem style
   rankCard:           { borderRadius: 16, padding: 16, marginBottom: 12, flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1 },
   rankCardUnranked:   { backgroundColor: '#13182A', borderColor: '#1E2740' },
-  emblem:             { width: 60, height: 60 },
+  emblemWrapper:      { width: 72, height: 72, justifyContent: 'center', alignItems: 'center', position: 'relative' },
+  emblemGlow:         { position: 'absolute', width: 60, height: 60, borderRadius: 30 },
+  emblem:             { width: 72, height: 72, zIndex: 1 },
+  emblemPlaceholder:  { width: 72, height: 72, borderRadius: 36, backgroundColor: '#1E2740' },
   rankInfo:           { flex: 1 },
   rankCardTitle:      { color: '#888', fontSize: 12, fontWeight: '600', marginBottom: 4 },
   tierText:           { fontSize: 18, fontWeight: '900', letterSpacing: 1 },
@@ -537,9 +566,13 @@ const styles = StyleSheet.create({
   hotStreakBadge:     { backgroundColor: '#2A1500', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2, borderWidth: 1, borderColor: '#FF6B0033' },
   hotStreakText:      { color: '#FF8C00', fontSize: 10, fontWeight: '700' },
 
-  // Match row
-  matchRow:           { backgroundColor: '#13182A', borderRadius: 12, padding: 12, marginBottom: 8, flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1, borderColor: '#1E2740', borderLeftWidth: 4 },
+  // Match row — CHANGED: matchLeft + spells
+  matchRow:           { backgroundColor: '#13182A', borderRadius: 12, padding: 12, marginBottom: 8, flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: '#1E2740', borderLeftWidth: 4 },
+  matchLeft:          { flexDirection: 'row', alignItems: 'center', gap: 4 },
   matchChampIcon:     { width: 44, height: 44, borderRadius: 22 },
+  spellsCol:          { gap: 2 },
+  spellIcon:          { width: 20, height: 20, borderRadius: 4 },
+  spellIconEmpty:     { width: 20, height: 20, borderRadius: 4, backgroundColor: '#1E2740' },
   matchInfo:          { flex: 1 },
   matchChampName:     { color: '#E8E0D0', fontWeight: '700', fontSize: 13 },
   matchMeta:          { color: '#555', fontSize: 11, marginBottom: 2 },
