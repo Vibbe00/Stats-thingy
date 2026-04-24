@@ -1,4 +1,4 @@
-import { db, connectDB } from "../db";
+import { connectDB } from "../db";
 import { riotClient } from "../riot/client";
 import { storeMatch, getExistingMatchIds } from "../db/queries";
 import { getRegion } from "../middleware/regions"
@@ -18,7 +18,6 @@ if (!region) {
     process.exit(1);
 }
 
-const ALL_QUEUES = [400, 420, 440];
 const BATCH_SIZE = 100;
 const SEASON_START = Math.floor(new Date("2026-01-08T00:00:00Z").getTime() / 1000);
 
