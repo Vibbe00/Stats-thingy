@@ -1,20 +1,22 @@
-import { SummonerCard } from "../components/SummonerCard";
-import { RankCard } from "../components/RankCard";
-import { MatchHistory } from "../components/MatchHistory";
-import './profile.css'
+import { useParams } from "react-router-dom"
+import { SummonerCard } from "../components/SummonerCard"
+import { RankCard } from "../components/RankCard"
+import { MatchHistory } from "../components/MatchHistory"
+import "./profile.css"
 
 export default function Profile() {
-  return (
-    <>
-      <div className="profile-layout">
-        <div className="profile-sidebar">
-          <SummonerCard region="eune" gameName="Siisti Kissa" tagLine="MEOW" />
-          <RankCard region="eune" gameName="Siisti Kissa" tagLine="MEOW" />
+    const { region, gameName, tagLine } = useParams()
+
+    return (
+        <div className="profile-layout">
+            <div className="profile-header">
+                <SummonerCard region={region} gameName={gameName} tagLine={tagLine} />
+                
+            </div>
+            <div className="profile-main">
+                <RankCard region={region} gameName={gameName} tagLine={tagLine} />
+                <MatchHistory region={region} gameName={gameName} tagLine={tagLine} />
+            </div>
         </div>
-        <div className="profile-main">
-          <MatchHistory region="eune" gameName="Siisti Kissa" tagLine="MEOW" />
-        </div>
-      </div>
-    </>
-  );
+    )
 }

@@ -1,18 +1,8 @@
-.profile-layout {
-    display: flex;
-    flex-direction: row;
-    padding:2em;
-   
-    
-}
 
-.profile-sidebar {
-    display: flex;
-    flex-direction: column;
-    width: 400px;
-    flex-shrink: 0;
-}
+
 
 .profile-main {
-flex: 1;
+    flex: 1;
+    display: flex;
+    flex-direction: row;
 }

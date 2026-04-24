@@ -1,42 +1,65 @@
 import "./searchbar.css";
 import { useState } from "react";
 
+export default function Searchbar({ setResults, region, setRegion }) {
+  const [gameName, setGameName] = useState("");
+  const [tagLine, setTagLine] = useState("");
+  const [error, setError] = useState(null);
 
-export default function Searchbar({setResults}) {
-  const [input, setInput] = useState("");
+  const handleSearch = () => {
+    if (!gameName || !tagLine) {
+      setError("Please fill in both fields.");
+      return;
+    }
 
-  const fetchData = (value) => {
-    fetch("https://jsonplaceholder.typicode.com/users")
-      .then((response) => response.json())
-      .then((json) => {
-        const results = json.filter((user) => {
-          return (
-            value &&
-            user &&
-            user.name &&
-            user.name.toLowerCase().includes(value)
-          );
-        });
-        setResults(results)
-      });
-  };
+    setError(null);
+    fetch(`http://localhost:3000/${region}/summoner/${gameName}/${tagLine}`)
+      .then(res => {
+        if (!res.ok) throw new Error("Player not found.");
+        return res.json();
+      })
+      .then(data => setResults([data]))
+      .catch(err => setError(err.message))
+  }
 
-  const handleChange = (value) => {
-    setInput(value);
-    fetchData(value);
-  };
   return (
     <div className="search-bar-container">
-      <div>
-        <h1 className="search-bar-title">League Data</h1>
-      </div>
+      <h1 className="search-bar-title">League Data</h1>
       <div className="input-wrapper">
+        <select className="region-select" value={region} onChange={(e) => setRegion(e.target.value)}>
+          <option value="euw">EUW</option>
+          <option value="eune">EUNE</option>
+          <option value="na">NA</option>
+          <option value="br">BR</option>
+          <option value="lan">LAN</option>
+          <option value="las">LAS</option>
+          <option value="kr">KR</option>
+          <option value="jp">JP</option>
+          <option value="tr">TR</option>
+          <option value="ru">RU</option>
+          <option value="oce">OCE</option>
+          <option value="ph">PH</option>
+          <option value="sg">SG</option>
+          <option value="th">TH</option>
+          <option value="tw">TW</option>
+          <option value="vn">VN</option>
+        </select>
         <input
-          value={input}
-          onChange={(e) => handleChange(e.target.value)}
-          placeholder="Searh Champions or players"
+          value={gameName}
+          onChange={(e) => setGameName(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+          placeholder="PlayerName"
         />
+        <span className="separator">#</span>
+        <input
+          value={tagLine}
+          onChange={(e) => setTagLine(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+          placeholder="TagLine"
+        />
+        <button className="search-button" onClick={handleSearch}>Search</button>
       </div>
+      {error && <span className="search-error">{error}</span>}
     </div>
   );
 }
