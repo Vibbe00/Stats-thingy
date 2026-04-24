@@ -10,6 +10,7 @@ import championsRouter from './routes/champions';
 import rankedRouter from './routes/ranked';
 import matchDetailsRouter from './routes/matchDetails'
 import { Router } from 'express';
+import recentRouter from './routes/recent';
 
 const app = express();
 
@@ -20,6 +21,8 @@ app.use(express.json());
 app.get('/health', (_req, res) => {
     res.json({ status: 'ok' });
 });
+
+app.use("/summoners", recentRouter);
 
 const regionRouter = Router();
 regionRouter.use("/summoner", summonerRouter);
