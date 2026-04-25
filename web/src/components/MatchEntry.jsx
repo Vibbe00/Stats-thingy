@@ -88,3 +88,4 @@ export const MatchEntry = ({ match, region, gameName, tagLine }) => {
     </div>
   );
 };
+

@@ -1,35 +1,18 @@
 import React from 'react'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { MatchEntry } from './MatchEntry'
 import { getQueueLabel } from './utils'
 import './matchHistory.css'
 
 
-export const MatchHistory = ({ region, gameName, tagLine }) => {
-    const [summoner, setSummoner] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+
+export const MatchHistory = ({matches, region, gameName, tagLine }) => {
+
     const [filter, setFilter] = useState(null);
-
-    useEffect(() => {
-        setLoading(true);
-        setError(null);
-        fetch(`http://localhost:3000/${region}/summoner/${gameName}/${tagLine}/matches`)
-            .then(response => {
-                if (!response.ok) throw new Error('Failed to fetch match history');
-                return response.json();
-            })
-            .then(data => setSummoner(data))
-            .catch(error => setError(error.message))
-            .finally(() => setLoading(false));
-    }, [gameName, tagLine]);
-
-    if (loading) return <div className="loading">Loading match history...</div>;
-    if (error) return <div>Error: {error}</div>;
-
+    
     const filteredMatches = filter
-        ? summoner.matches.filter(match => match.queueId === filter)
-        : summoner.matches;
+        ? matches.matches.filter(match => match.queueId === filter)
+        : matches.matches;
 
     const noMatches = filteredMatches.length === 0;
 

@@ -1,5 +1,4 @@
 import React from "react";
-import { useState, useEffect } from "react";
 import "./rankCard.css";
 
 const getRankEmblem = (tier) => {
@@ -7,28 +6,8 @@ const getRankEmblem = (tier) => {
   return `https://opgg-static.akamaized.net/images/medals_new/${tier.toLowerCase()}.png`;
 };
 
-export const RankCard = ({ region, gameName, tagLine }) => {
-  const [ranked, setRanked] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    setLoading(true);
-    setError(null);
-
-    fetch(`http://localhost:3000/${region}/summoner/${gameName}/${tagLine}/ranked`)
-      .then(res => {
-        if (!res.ok) throw new Error(`Virhe ${res.status}: ${res.statusText}`);
-        return res.json();
-      })
-      .then(data => setRanked(data))
-      .catch(err => setError(err.message))
-      .finally(() => setLoading(false));
-  }, [gameName, tagLine]);
-
-  if (loading) return <div>Ladataan rankit...</div>;
-  if (error) return <div>Virhe: {error}</div>;
-  if (!ranked) return null;
+export const RankCard = ({ ranked }) => {
+  
 
   const queues = [
     { label: "Ranked Solo/Duo", data: ranked.soloQueue },
