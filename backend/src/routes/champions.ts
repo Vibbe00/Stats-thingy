@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { riotClient } from "../riot/client";
 import { getChampionStats } from "../db/queries";
+import { championIconUrl, getDDragonVersion } from "../middleware/dataDragon";
 
 const router = Router();
 
@@ -25,6 +26,7 @@ router.get("/:gameName/:tagLine/champions", async (req, res, next) => {
             : ALL_QUEUES;
 
         const account = await riotClient.getAccountByRiotId(gameName, tagLine, region);
+        const version = await getDDragonVersion();
         const rows = await getChampionStats(account.puuid, queues);
 
         if (rows.length === 0) {
@@ -42,6 +44,7 @@ router.get("/:gameName/:tagLine/champions", async (req, res, next) => {
             return {
                 championName: row.champion_name,
                 championId: row.champion_id,
+                championIcon: championIconUrl(row.champion_name, version),
                 gamesPlayed,
                 wins,
                 losses: parseInt(row.losses),
