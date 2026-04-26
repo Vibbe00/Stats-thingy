@@ -1,23 +1,26 @@
 import React from 'react'
 import "./championStats.css";
 
-const getChampionIcon = (championName) => {
-    return `https://ddragon.leagueoflegends.com/cdn/16.8.1/img/champion/${championName}.png`
-}
+
 
 export const ChampionStats = ({ champions }) => {
     
 
     return (
+        <>
         <div className="champion-stats">
-            {champions.champions.slice(0, 5).map((champion, index) => (
+            
+            {champions.champions.map((champion, index) => (
              <div key={index}>
                 <div className="champion-entry" >
-
+                    <div className="champ-icon-name-cs">
+                    <img className="champ-icon" src={champion.championIcon} alt ={champion.championName}/>
                     <div className="name-and-cs">   
                     <span className="champion-name">{champion.championName}</span>
                     <span className="champion-cs">{champion.avgCs} CS</span>
                     </div>
+                    </div>
+
                     <div className="stats-and-kda">
                     <span className="champion-kda">{champion.avgKda} KDA</span>
                     <span className="champ-stats">{champion.avgKills}/{champion.avgDeaths}/{champion.avgAssists}</span>
@@ -27,10 +30,11 @@ export const ChampionStats = ({ champions }) => {
                     <span className="champion-games">{champion.gamesPlayed} games</span>
                     </div>
                 </div>
-                {index < 4 && <div className="champ-divider"></div>}
+                {index >= 0 && <div className="champ-divider"></div>}
                 </div>
             ))}
             
         </div>
+        </>
     )
 }

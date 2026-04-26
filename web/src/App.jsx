@@ -5,7 +5,6 @@ import Header from "./components/Header"
 
 import Champions from "./pages/champions";
 import Profile from "./pages/profile";
-import Joo from "./pages/joo";
 import Home from "./pages/home";
 import { Route, Routes } from 'react-router-dom'
 
@@ -18,7 +17,6 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />}/>
           <Route path="/champions" element={<Champions />}/>
-          <Route path="/joo" element={<Joo />}/>
           <Route path="/profile/:region/:gameName/:tagLine" element={<Profile />}/>
         </Routes>
       </Body>

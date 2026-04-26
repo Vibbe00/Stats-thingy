@@ -3,12 +3,10 @@
     flex-direction: column;
     background-color:  rgb(44, 44, 44);
     border-radius: 8px;
-    padding: 16px;
+    padding-bottom: 15px;
     margin-top: 0.5em;
     color: #fff;
     margin-inline: 0.5em;
-    margin-top: 0.5em;
-   
     
     
 }
@@ -17,12 +15,17 @@
     display: flex;
     align-items: center;
     flex-direction: row;
-    gap:10px;
     margin: 8px;
     font-size:12px;
     justify-content: space-between;
-  
     
+    
+}
+
+.champ-icon{
+    width:40px;
+    height:40px;
+    border-radius: 50%;
 }
 
 .champ-divider {
@@ -50,4 +53,13 @@
     flex-direction: column;
     gap: 0.5em;
 }
+
+.champ-icon-name-cs{
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+    gap:1em;
+}
+
+
 
