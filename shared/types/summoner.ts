@@ -112,6 +112,7 @@ export interface RankedResponse {
 export interface ChampionStats {
   championName: string;
   championId: number;
+  championIcon: string;
   gamesPlayed: number;
   wins: number;
   losses: number;

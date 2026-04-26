@@ -40,12 +40,17 @@ export function itemIconUrl(itemId: number, version: string) {
     return `https://ddragon.leagueoflegends.com/cdn/${version}/img/item/${itemId}.png`;
 }
 
+const CHAMPION_NAME_FIXES: Record<string, string> = {
+    Fiddlesticks: "FiddleSticks",
+};
+
 export function championIconUrl(championName: string, version: string): string {
+    const name = CHAMPION_NAME_FIXES[championName] ?? championName;
     return `https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${championName}.png`;
 }
 
 export function summonerSpellIconUrl(spellId: number, version: string): string | null {
-    if (spellId === 0) return null;
+    if (spellId === 0 || !SUMMONER_SPELL_NAMES[spellId]) return null;
     return `https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/${SUMMONER_SPELL_NAMES[spellId]}.png`;
 }
 

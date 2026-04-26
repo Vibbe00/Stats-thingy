@@ -7,10 +7,16 @@ import { upsertSummoner } from "../db/queries";
 const router = Router();
 
 function rankedStats(entry: LeagueEntry) {
+    const games = entry.wins + entry.losses;
     return {
-        ...entry,
-        winRate: entry.wins / (entry.wins + entry.losses)
-    }
+        tier: entry.tier,
+        rank: entry.rank,
+        leaguePoints: entry.leaguePoints,
+        wins: entry.wins,
+        losses: entry.losses,
+        winRate: games > 0 ? parseFloat((entry.wins / games).toFixed(4)) : 0,
+        hotStreak: entry.hotStreak,
+    };
 }
 
 // GET /summoner/:gameName/:tagLine
