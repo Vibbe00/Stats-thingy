@@ -25,7 +25,7 @@ router.get("/:gameName/:tagLine/matches/:matchId", async (req, res, next) => {
 
         const nameLookup = new Map<string, { gameName: string; tagLine: string }>();
         for (const p of match.info.participants) {
-            nameLookup.set(p.puuid, {
+            nameLookup.set(`${p.championId}-${p.teamId}`, {
                 gameName: p.riotIdGameName,
                 tagLine: p.riotIdTagline,
             });
@@ -40,7 +40,7 @@ router.get("/:gameName/:tagLine/matches/:matchId", async (req, res, next) => {
         }
 
         const formatPlayer = (row: any) => {
-            const name = nameLookup.get(row.puuid);
+            const name = nameLookup.get(`${row.champion_id}-${row.team_id}`);
             return {
                 puuid: row.puuid,
                 gameName: name?.gameName ?? row.game_name ?? null,
