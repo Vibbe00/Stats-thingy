@@ -2,16 +2,12 @@
 .header{
     background-color:#1b1b1b ; 
     display:flex;
-    align-items: center;
+    align-items: flex-start;
     padding-top: 1em;
     padding-bottom: 1em;
 }
 
-.header-links{
-display:flex;
-justify-content: space-between;
-width:100%;
-}
+
 
 .title{
     font-size: larger;
@@ -19,9 +15,5 @@ width:100%;
     padding-left: 2rem;
     
 }
-.sign-up{
-    font-size: larger;
-    color:white;
-    padding-right: 2rem;
-}
+
 

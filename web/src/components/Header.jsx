@@ -8,7 +8,7 @@ export default function Header(){
             <div className = "header-links">
          
             <a href = "/"><h1 className = "title">League Data</h1></a>
-             <a href = "/"><h1 className = "sign-up">Sign Up</h1></a>
+            
            
             </div>
 
