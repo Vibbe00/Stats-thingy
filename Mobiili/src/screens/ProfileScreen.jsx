@@ -48,14 +48,26 @@ const TIER_CONFIG = {
   CHALLENGER:  { color: '#F4C874', bg: '#1A1200', label: 'Challenger',  emblemColor: '#F4C874' },
 };
 
-// Emoji emblems — no CDN needed, always reliable
+// Emoji fallback for when emblem image fails to load
 const TIER_EMOJI = {
   IRON: '⚫', BRONZE: '🥉', SILVER: '🥈', GOLD: '🥇',
   PLATINUM: '🔵', EMERALD: '💚', DIAMOND: '💠',
   MASTER: '💎', GRANDMASTER: '👑', CHALLENGER: '🏆',
 };
 
+// Community Dragon emblem URL
+const tierEmblemUrl = (tier) =>
+  `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/images/ranked-emblem/emblem-${tier?.toLowerCase()}.png`;
+
 const QUEUE_LABELS = { 420: 'Ranked Solo', 440: 'Ranked Flex', 400: 'Normal Draft' };
+
+// Queue filter options for the Matches tab
+const QUEUE_FILTERS = [
+  { label: 'All',   value: undefined  },
+  { label: 'Solo',  value: 'solo'     },
+  { label: 'Flex',  value: 'flex'     },
+  { label: 'Draft', value: 'draft'    },
+];
 
 const TABS = ['Overview', 'Matches', 'Champions'];
 
@@ -70,19 +82,20 @@ export default function ProfileScreen() {
   const [error,         setError]         = useState('');
   const [backendOnline, setBackendOnline] = useState(null);
 
-  // Profile data
   const [profile,         setProfile]         = useState(null);
   const [matches,         setMatches]         = useState(null);
+  const [matchesLoading,  setMatchesLoading]  = useState(false);
   const [champions,       setChampions]       = useState(null);
   const [activeTab,       setActiveTab]       = useState('Overview');
-
-  // Recent summoners from GET /summoner/recent
+  const [queueFilter,     setQueueFilter]     = useState(QUEUE_FILTERS[0]);
   const [recentSummoners, setRecentSummoners] = useState([]);
+
+  // Stored search params for re-fetching when queue filter changes
+  const [lastSearch, setLastSearch] = useState(null);
 
   useEffect(() => {
     checkBackendHealth().then((online) => {
       setBackendOnline(online);
-      // Load recent summoners on mount if backend is up
       if (online) {
         getRecentSummoners()
           .then((data) => setRecentSummoners(data.summoners ?? []))
@@ -90,6 +103,24 @@ export default function ProfileScreen() {
       }
     });
   }, []);
+
+  // Re-fetch matches when queue filter changes (only if we have a profile loaded)
+  useEffect(() => {
+    if (!lastSearch) return;
+    fetchMatches(lastSearch.region, lastSearch.gameName, lastSearch.tagLine, queueFilter.value);
+  }, [queueFilter]);
+
+  const fetchMatches = async (region, gameName, tagLine, queue) => {
+    setMatchesLoading(true);
+    try {
+      const matchData = await getSummonerMatches(region, gameName, tagLine, 20, queue);
+      setMatches(matchData);
+    } catch {
+      setMatches({ matches: [] });
+    } finally {
+      setMatchesLoading(false);
+    }
+  };
 
   const handleSearch = async () => {
     const trimmed = input.trim();
@@ -114,18 +145,21 @@ export default function ProfileScreen() {
     setMatches(null);
     setChampions(null);
     setActiveTab('Overview');
+    setQueueFilter(QUEUE_FILTERS[0]); // reset filter on new search
+
+    const search = { region: region.value, gameName, tagLine };
+    setLastSearch(search);
 
     try {
       const [profileData, matchData, champData] = await Promise.all([
         getSummonerProfile(region.value, gameName, tagLine),
-        getSummonerMatches(region.value, gameName, tagLine, 20, 'solo'),
+        getSummonerMatches(region.value, gameName, tagLine, 20),
         getSummonerChampions(region.value, gameName, tagLine),
       ]);
       setProfile(profileData);
       setMatches(matchData);
       setChampions(champData);
 
-      // Refresh recent summoners after a successful search
       getRecentSummoners()
         .then((data) => setRecentSummoners(data.summoners ?? []))
         .catch(() => {});
@@ -136,7 +170,6 @@ export default function ProfileScreen() {
     }
   };
 
-  // Quick-search from recent summoners list
   const handleRecentTap = (summoner) => {
     setInput(`${summoner.gameName}#${summoner.tagLine}`);
   };
@@ -166,7 +199,6 @@ export default function ProfileScreen() {
 
         <BackendStatus online={backendOnline} />
 
-        {/* Search row */}
         <View style={styles.searchRow}>
           <TouchableOpacity style={styles.regionBtn} onPress={() => setShowPicker(true)}>
             <Text style={styles.regionBtnFlag}>{region.flag}</Text>
@@ -198,14 +230,12 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Error */}
         {!!error && (
           <View style={styles.errorBox}>
             <Text style={styles.errorText}>⚠️  {error}</Text>
           </View>
         )}
 
-        {/* Profile result */}
         {profile && (
           <View style={{ marginTop: 8 }}>
             <ProfileHeader profile={profile} region={region} />
@@ -225,12 +255,18 @@ export default function ProfileScreen() {
             </View>
 
             {activeTab === 'Overview'  && <OverviewTab  profile={profile} />}
-            {activeTab === 'Matches'   && <MatchesTab   matches={matches} />}
+            {activeTab === 'Matches'   && (
+              <MatchesTab
+                matches={matches}
+                loading={matchesLoading}
+                queueFilter={queueFilter}
+                onQueueChange={setQueueFilter}
+              />
+            )}
             {activeTab === 'Champions' && <ChampionsTab champions={champions} />}
           </View>
         )}
 
-        {/* Empty state — show recent summoners */}
         {!profile && !loading && !error && (
           <View>
             {recentSummoners.length > 0 ? (
@@ -259,7 +295,7 @@ export default function ProfileScreen() {
   );
 }
 
-// ─── Recent Summoner Row — RecentSummoner from shared/types ───────────────────
+// ─── Recent Summoner Row ──────────────────────────────────────────────────────
 function RecentSummonerRow({ summoner, onPress }) {
   return (
     <TouchableOpacity style={styles.recentRow} onPress={onPress} activeOpacity={0.7}>
@@ -312,22 +348,47 @@ function OverviewTab({ profile }) {
   );
 }
 
-// ─── Matches Tab ──────────────────────────────────────────────────────────────
-function MatchesTab({ matches }) {
-  if (!matches) return <LoadingBlock />;
-  if (!matches.matches?.length) return <EmptyBlock text="No recent matches found" />;
-
+// ─── Matches Tab — with queue filter ─────────────────────────────────────────
+function MatchesTab({ matches, loading, queueFilter, onQueueChange }) {
   return (
     <View>
-      <Text style={styles.sectionLabel}>RECENT MATCHES</Text>
-      {matches.matches.map((match) => (
-        <MatchRow key={match.matchId} match={match} />
-      ))}
+      {/* Queue filter row */}
+      <View style={styles.filterRow}>
+        {QUEUE_FILTERS.map((f) => (
+          <TouchableOpacity
+            key={f.label}
+            style={[styles.filterBtn, queueFilter.label === f.label && styles.filterBtnActive]}
+            onPress={() => onQueueChange(f)}
+          >
+            <Text style={[styles.filterLabel, queueFilter.label === f.label && styles.filterLabelActive]}>
+              {f.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {loading ? (
+        <ActivityIndicator size="large" color="#C89B3C" style={{ marginTop: 24 }} />
+      ) : !matches ? (
+        <LoadingBlock />
+      ) : !matches.matches?.length ? (
+        <EmptyBlock text="No matches found for this filter" />
+      ) : (
+        <View>
+          <Text style={styles.sectionLabel}>
+            RECENT MATCHES
+            {queueFilter.value ? `  ·  ${queueFilter.label.toUpperCase()}` : ''}
+          </Text>
+          {matches.matches.map((match) => (
+            <MatchRow key={match.matchId} match={match} />
+          ))}
+        </View>
+      )}
     </View>
   );
 }
 
-// ─── Match Row — summonerSpells now work from backend ─────────────────────────
+// ─── Match Row ────────────────────────────────────────────────────────────────
 function MatchRow({ match }) {
   const p        = match.player;
   const duration = `${Math.floor(match.gameDuration / 60)}:${String(match.gameDuration % 60).padStart(2, '0')}`;
@@ -336,10 +397,8 @@ function MatchRow({ match }) {
 
   return (
     <View style={[styles.matchRow, { borderLeftColor: winColor }]}>
-      {/* Champion icon + summoner spells */}
       <View style={styles.matchLeft}>
         <Image source={{ uri: p.championIcon }} style={styles.matchChampIcon} />
-        {/* Spells — backend now properly returns icon URLs */}
         {p.summonerSpells?.length > 0 && (
           <View style={styles.spellsCol}>
             {p.summonerSpells.slice(0, 2).map((spell, i) =>
@@ -351,7 +410,6 @@ function MatchRow({ match }) {
         )}
       </View>
 
-      {/* Middle info */}
       <View style={styles.matchInfo}>
         <Text style={styles.matchChampName}>{p.championName}</Text>
         <Text style={styles.matchMeta}>{qLabel} · {duration}</Text>
@@ -370,7 +428,6 @@ function MatchRow({ match }) {
         </Text>
       </View>
 
-      {/* Win/loss + items */}
       <View style={styles.matchRight}>
         <View style={[styles.winBadge, { backgroundColor: winColor + '22', borderColor: winColor + '55' }]}>
           <Text style={[styles.winBadgeText, { color: winColor }]}>{p.win ? 'WIN' : 'LOSS'}</Text>
@@ -402,31 +459,26 @@ function ChampionsTab({ champions }) {
   );
 }
 
-// ─── Champion Row — now shows championIcon from ChampionStats ─────────────────
 function ChampionRow({ champ }) {
   const wrPct   = Math.round(champ.winRate * 100);
   const wrColor = wrPct >= 60 ? '#4FBB82' : wrPct >= 50 ? '#C89B3C' : '#BB4F4F';
 
   return (
     <View style={styles.champRow}>
-      {/* Champion icon — new field from updated backend */}
       {champ.championIcon
         ? <Image source={{ uri: champ.championIcon }} style={styles.champIcon} />
         : <View style={styles.champIconEmpty} />
       }
-
       <View style={styles.champLeft}>
         <Text style={styles.champName} numberOfLines={1}>{champ.championName}</Text>
         <Text style={styles.champGames}>{champ.gamesPlayed} games</Text>
       </View>
-
       <View style={styles.champMid}>
         <Text style={styles.champKda}>
           {champ.avgKills.toFixed(1)} / {champ.avgDeaths.toFixed(1)} / {champ.avgAssists.toFixed(1)}
         </Text>
         <Text style={styles.champKdaLabel}>{champ.avgKda.toFixed(2)} KDA · {champ.avgCs.toFixed(0)} CS</Text>
       </View>
-
       <View style={styles.champRight}>
         <Text style={[styles.champWr, { color: wrColor }]}>{wrPct}%</Text>
         <Text style={styles.champWrLabel}>{champ.wins}W {champ.losses}L</Text>
@@ -435,8 +487,10 @@ function ChampionRow({ champ }) {
   );
 }
 
-// ─── Rank Card — emoji emblems, no CDN ───────────────────────────────────────
+// ─── Rank Card — image emblem with emoji fallback ─────────────────────────────
 function RankCard({ title, icon, stats }) {
+  const [imgFailed, setImgFailed] = useState(false);
+
   if (!stats) {
     return (
       <View style={[styles.rankCard, styles.rankCardUnranked]}>
@@ -452,9 +506,9 @@ function RankCard({ title, icon, stats }) {
     );
   }
 
-  const cfg     = TIER_CONFIG[stats.tier] ?? TIER_CONFIG.IRON;
-  const wrPct   = Math.round(stats.winRate * 100);
-  const wrColor = wrPct >= 60 ? '#4FBB82' : wrPct >= 50 ? '#C89B3C' : '#BB4F4F';
+  const cfg        = TIER_CONFIG[stats.tier] ?? TIER_CONFIG.IRON;
+  const wrPct      = Math.round(stats.winRate * 100);
+  const wrColor    = wrPct >= 60 ? '#4FBB82' : wrPct >= 50 ? '#C89B3C' : '#BB4F4F';
   const rankSuffix = ['MASTER', 'GRANDMASTER', 'CHALLENGER'].includes(stats.tier)
     ? '' : ` ${stats.rank}`;
 
@@ -463,11 +517,23 @@ function RankCard({ title, icon, stats }) {
       colors={[cfg.bg, '#0A0E1A']}
       style={[styles.rankCard, { borderColor: cfg.color + '55' }]}
     >
-      <View style={[styles.emblemWrapper, { backgroundColor: cfg.color + '22', borderColor: cfg.color + '55' }]}>
-        <Text style={styles.emblemEmoji}>{TIER_EMOJI[stats.tier] ?? '⚫'}</Text>
-        <Text style={[styles.emblemLabel, { color: cfg.color }]}>
-          {cfg.label.slice(0, 4).toUpperCase()}
-        </Text>
+      {/* Emblem — image with emoji fallback if CDN fails */}
+      <View style={[styles.emblemWrapper, { borderColor: cfg.color + '55', backgroundColor: cfg.color + '11' }]}>
+        {!imgFailed ? (
+          <Image
+            source={{ uri: tierEmblemUrl(stats.tier) }}
+            style={styles.emblemImage}
+            resizeMode="contain"
+            onError={() => setImgFailed(true)}
+          />
+        ) : (
+          <>
+            <Text style={styles.emblemEmoji}>{TIER_EMOJI[stats.tier] ?? '⚫'}</Text>
+            <Text style={[styles.emblemLabel, { color: cfg.color }]}>
+              {cfg.label.slice(0, 4).toUpperCase()}
+            </Text>
+          </>
+        )}
       </View>
 
       <View style={styles.rankInfo}>
@@ -537,7 +603,6 @@ function BackendStatus({ online }) {
   );
 }
 
-// ─── Utilities ────────────────────────────────────────────────────────────────
 const LoadingBlock = () => (
   <ActivityIndicator size="large" color="#C89B3C" style={{ marginTop: 32 }} />
 );
@@ -581,7 +646,7 @@ const styles = StyleSheet.create({
   errorBox:          { backgroundColor: '#2A0F0F', borderRadius: 10, padding: 12, borderLeftWidth: 3, borderLeftColor: '#BB4F4F', marginBottom: 12 },
   errorText:         { color: '#FF6B6B', fontSize: 13, lineHeight: 18 },
 
-  // Recent summoners
+  // Recent
   recentRow:         { flexDirection: 'row', alignItems: 'center', backgroundColor: '#13182A', borderRadius: 12, padding: 12, marginBottom: 8, borderWidth: 1, borderColor: '#1E2740', gap: 12 },
   recentIcon:        { width: 44, height: 44, borderRadius: 22, borderWidth: 1, borderColor: '#C89B3C44' },
   recentInfo:        { flex: 1 },
@@ -612,11 +677,19 @@ const styles = StyleSheet.create({
 
   sectionLabel:      { color: '#C89B3C', fontSize: 11, fontWeight: '700', letterSpacing: 2, marginBottom: 10, marginTop: 14 },
 
+  // Queue filter
+  filterRow:         { flexDirection: 'row', gap: 8, marginTop: 14, marginBottom: 2 },
+  filterBtn:         { paddingVertical: 6, paddingHorizontal: 14, borderRadius: 16, backgroundColor: '#13182A', borderWidth: 1, borderColor: '#1E2740' },
+  filterBtnActive:   { backgroundColor: '#1E2740', borderColor: '#C89B3C55' },
+  filterLabel:       { color: '#444', fontWeight: '600', fontSize: 12 },
+  filterLabelActive: { color: '#C89B3C' },
+
   // Rank card
   rankCard:          { borderRadius: 16, padding: 16, marginBottom: 12, flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1 },
   rankCardUnranked:  { backgroundColor: '#13182A', borderColor: '#1E2740' },
-  emblemWrapper:     { width: 68, height: 68, borderRadius: 34, borderWidth: 2, justifyContent: 'center', alignItems: 'center' },
+  emblemWrapper:     { width: 68, height: 68, borderRadius: 34, borderWidth: 2, justifyContent: 'center', alignItems: 'center', overflow: 'hidden' },
   emblemUnranked:    { backgroundColor: '#1E2740', borderColor: '#2A2A3A' },
+  emblemImage:       { width: 68, height: 68 },
   emblemEmoji:       { fontSize: 28 },
   emblemLabel:       { fontSize: 8, fontWeight: '800', marginTop: 2, color: '#555' },
   rankInfo:          { flex: 1 },
@@ -660,7 +733,7 @@ const styles = StyleSheet.create({
   itemIcon:          { width: 22, height: 22, borderRadius: 4 },
   itemIconEmpty:     { width: 22, height: 22, borderRadius: 4, backgroundColor: '#1E2740' },
 
-  // Champion row — added champIcon
+  // Champion row
   champRow:          { backgroundColor: '#13182A', borderRadius: 12, padding: 12, marginBottom: 8, flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: '#1E2740' },
   champIcon:         { width: 40, height: 40, borderRadius: 20 },
   champIconEmpty:    { width: 40, height: 40, borderRadius: 20, backgroundColor: '#1E2740' },
@@ -685,7 +758,6 @@ const styles = StyleSheet.create({
   regionLabel:       { color: '#666', fontSize: 11, fontWeight: '700' },
   regionLabelActive: { color: '#C89B3C' },
 
-  // Empty / loading
   emptyState:        { alignItems: 'center', marginTop: 60, gap: 12 },
   emptyIcon:         { fontSize: 48 },
   emptyText:         { color: '#444', fontSize: 14, textAlign: 'center', lineHeight: 22 },
