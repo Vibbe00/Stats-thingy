@@ -1,0 +1,82 @@
+
+.summoner-card {
+    display: flex;
+    align-self: flex-start;
+    align-items: center;
+    background-color: rgb(44, 44, 44);
+    border-radius: 10px;
+    padding: 1.5em;
+    margin-top: 1.5em;
+    gap: 1em;
+    width: 100%;
+}
+
+.profile-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 10%;
+    margin-bottom: 10px; 
+}
+
+.summoner-info-and-region {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+.summoner-region {
+    color: #aaaaaa;
+    font-size: 12px;
+    margin-left:0.5em;
+}
+
+.summoner-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+}
+
+.summoner-name {
+    color: rgb(255, 255, 255);
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.summoner-tagline {
+    color: rgb(165, 165, 165);
+    font-size: 18px;
+    font-weight: normal;
+}
+
+.profile-icon-wrapper {
+    position: relative;
+    width: fit-content;
+}
+
+.summoner-level {
+    position: absolute;
+    left: 50%;
+    bottom: 6px;
+    transform: translateX(-50%);
+    color: white;
+    background-color: #1b1b1b;
+    border-radius: 10px;
+    padding: 2px 8px;
+    font-size: 12px;
+}
+
+.error {
+    color: red;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.loading {
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 20px;
+}
