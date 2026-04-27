@@ -1,0 +1,18 @@
+.search-result {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    padding: 10px 20px;
+    cursor: pointer;
+   
+}
+
+.search-result img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.summoner-name-tag {
+    font-size: 16px;
+}
