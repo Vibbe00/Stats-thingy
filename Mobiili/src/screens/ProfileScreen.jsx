@@ -14,6 +14,22 @@ import {
   getRecentSummoners,
 } from '../api/riot';
 
+// ─── Theme tokens ─────────────────────────────────────────────────────────────
+const T = {
+  bg:        '#1b1b1b',          // body
+  card:      'rgb(44, 44, 44)',  // summoner card / rank card divs
+  cardBorder:'#333333',
+  accent:    '#4b995c',          // header green
+  accentDim: '#4b995c88',
+  accentBg:  '#4b995c18',
+  textPri:   '#f0f0f0',
+  textSec:   '#999999',
+  textMuted: '#555555',
+  win:       '#4FBB82',
+  loss:      '#BB4F4F',
+  font:      Platform.OS === 'ios' ? 'Arial' : 'sans-serif', // Arial, Helvetica, sans-serif
+};
+
 // ─── Regions ──────────────────────────────────────────────────────────────────
 const REGIONS = [
   { label: 'EUW',  value: 'euw',  flag: '🇪🇺' },
@@ -36,37 +52,34 @@ const REGIONS = [
 
 // ─── Tier config ──────────────────────────────────────────────────────────────
 const TIER_CONFIG = {
-  IRON:        { color: '#6B6B6B', bg: '#1A1A1A', label: 'Iron',        emblemColor: '#6B6B6B' },
-  BRONZE:      { color: '#CD7F32', bg: '#1F1208', label: 'Bronze',      emblemColor: '#CD7F32' },
-  SILVER:      { color: '#A8A9AD', bg: '#111418', label: 'Silver',      emblemColor: '#A8A9AD' },
-  GOLD:        { color: '#C89B3C', bg: '#1A1508', label: 'Gold',        emblemColor: '#C89B3C' },
-  PLATINUM:    { color: '#0AC8B9', bg: '#071A19', label: 'Platinum',    emblemColor: '#0AC8B9' },
-  EMERALD:     { color: '#00C473', bg: '#071A0F', label: 'Emerald',     emblemColor: '#00C473' },
-  DIAMOND:     { color: '#576BCE', bg: '#080D1F', label: 'Diamond',     emblemColor: '#576BCE' },
-  MASTER:      { color: '#9D48E0', bg: '#130820', label: 'Master',      emblemColor: '#9D48E0' },
-  GRANDMASTER: { color: '#E84057', bg: '#1F0508', label: 'Grandmaster', emblemColor: '#E84057' },
-  CHALLENGER:  { color: '#F4C874', bg: '#1A1200', label: 'Challenger',  emblemColor: '#F4C874' },
+  IRON:        { color: '#8a8a8a', bg: '#222222', label: 'Iron'        },
+  BRONZE:      { color: '#CD7F32', bg: '#261a0e', label: 'Bronze'      },
+  SILVER:      { color: '#b0b5bb', bg: '#1e2022', label: 'Silver'      },
+  GOLD:        { color: '#d4a843', bg: '#252010', label: 'Gold'        },
+  PLATINUM:    { color: '#0AC8B9', bg: '#0e2120', label: 'Platinum'    },
+  EMERALD:     { color: '#4b995c', bg: '#0f2014', label: 'Emerald'     },
+  DIAMOND:     { color: '#7a9de0', bg: '#141826', label: 'Diamond'     },
+  MASTER:      { color: '#a855d4', bg: '#1a0e22', label: 'Master'      },
+  GRANDMASTER: { color: '#e05555', bg: '#220e0e', label: 'Grandmaster' },
+  CHALLENGER:  { color: '#e8c96e', bg: '#241e08', label: 'Challenger'  },
 };
 
-// Emoji fallback for when emblem image fails to load
 const TIER_EMOJI = {
   IRON: '⚫', BRONZE: '🥉', SILVER: '🥈', GOLD: '🥇',
   PLATINUM: '🔵', EMERALD: '💚', DIAMOND: '💠',
   MASTER: '💎', GRANDMASTER: '👑', CHALLENGER: '🏆',
 };
 
-// Community Dragon emblem URL
 const tierEmblemUrl = (tier) =>
   `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/images/ranked-emblem/emblem-${tier?.toLowerCase()}.png`;
 
 const QUEUE_LABELS = { 420: 'Ranked Solo', 440: 'Ranked Flex', 400: 'Normal Draft' };
 
-// Queue filter options for the Matches tab
 const QUEUE_FILTERS = [
-  { label: 'All',   value: undefined  },
-  { label: 'Solo',  value: 'solo'     },
-  { label: 'Flex',  value: 'flex'     },
-  { label: 'Draft', value: 'draft'    },
+  { label: 'All',   value: undefined },
+  { label: 'Solo',  value: 'solo'    },
+  { label: 'Flex',  value: 'flex'    },
+  { label: 'Draft', value: 'draft'   },
 ];
 
 const TABS = ['Overview', 'Matches', 'Champions'];
@@ -76,7 +89,7 @@ export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
 
   const [input,         setInput]         = useState('');
-  const [region,        setRegion]        = useState(REGIONS[1]); // default EUNE
+  const [region,        setRegion]        = useState(REGIONS[1]);
   const [showPicker,    setShowPicker]    = useState(false);
   const [loading,       setLoading]       = useState(false);
   const [error,         setError]         = useState('');
@@ -89,22 +102,19 @@ export default function ProfileScreen() {
   const [activeTab,       setActiveTab]       = useState('Overview');
   const [queueFilter,     setQueueFilter]     = useState(QUEUE_FILTERS[0]);
   const [recentSummoners, setRecentSummoners] = useState([]);
-
-  // Stored search params for re-fetching when queue filter changes
-  const [lastSearch, setLastSearch] = useState(null);
+  const [lastSearch,      setLastSearch]      = useState(null);
 
   useEffect(() => {
     checkBackendHealth().then((online) => {
       setBackendOnline(online);
       if (online) {
         getRecentSummoners()
-          .then((data) => setRecentSummoners(data.summoners ?? []))
+          .then((d) => setRecentSummoners(d.summoners ?? []))
           .catch(() => {});
       }
     });
   }, []);
 
-  // Re-fetch matches when queue filter changes (only if we have a profile loaded)
   useEffect(() => {
     if (!lastSearch) return;
     fetchMatches(lastSearch.region, lastSearch.gameName, lastSearch.tagLine, queueFilter.value);
@@ -113,8 +123,8 @@ export default function ProfileScreen() {
   const fetchMatches = async (region, gameName, tagLine, queue) => {
     setMatchesLoading(true);
     try {
-      const matchData = await getSummonerMatches(region, gameName, tagLine, 20, queue);
-      setMatches(matchData);
+      const data = await getSummonerMatches(region, gameName, tagLine, 20, queue);
+      setMatches(data);
     } catch {
       setMatches({ matches: [] });
     } finally {
@@ -125,19 +135,11 @@ export default function ProfileScreen() {
   const handleSearch = async () => {
     const trimmed = input.trim();
     if (!trimmed) return;
-
     const hashIndex = trimmed.indexOf('#');
-    if (hashIndex === -1) {
-      setError('Include your tag — format: Name#TAG  e.g. HesburgerCEO#EUNE');
-      return;
-    }
-
+    if (hashIndex === -1) { setError('Format: Name#TAG'); return; }
     const gameName = trimmed.slice(0, hashIndex).trim();
     const tagLine  = trimmed.slice(hashIndex + 1).trim();
-    if (!gameName || !tagLine) {
-      setError('Both name and tag are required — e.g. Faker#KR1');
-      return;
-    }
+    if (!gameName || !tagLine) { setError('Both name and tag are required'); return; }
 
     setLoading(true);
     setError('');
@@ -145,7 +147,7 @@ export default function ProfileScreen() {
     setMatches(null);
     setChampions(null);
     setActiveTab('Overview');
-    setQueueFilter(QUEUE_FILTERS[0]); // reset filter on new search
+    setQueueFilter(QUEUE_FILTERS[0]);
 
     const search = { region: region.value, gameName, tagLine };
     setLastSearch(search);
@@ -159,10 +161,7 @@ export default function ProfileScreen() {
       setProfile(profileData);
       setMatches(matchData);
       setChampions(champData);
-
-      getRecentSummoners()
-        .then((data) => setRecentSummoners(data.summoners ?? []))
-        .catch(() => {});
+      getRecentSummoners().then((d) => setRecentSummoners(d.summoners ?? [])).catch(() => {});
     } catch (err) {
       setError(err.message ?? 'Something went wrong');
     } finally {
@@ -170,13 +169,9 @@ export default function ProfileScreen() {
     }
   };
 
-  const handleRecentTap = (summoner) => {
-    setInput(`${summoner.gameName}#${summoner.tagLine}`);
-  };
-
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: '#0A0E1A' }}
+      style={{ flex: 1, backgroundColor: T.bg }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <RegionPickerModal
@@ -194,11 +189,13 @@ export default function ProfileScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
+        {/* Header */}
         <Text style={styles.title}>PROFILE</Text>
         <Text style={styles.subtitle}>Search by Riot ID</Text>
 
         <BackendStatus online={backendOnline} />
 
+        {/* Search */}
         <View style={styles.searchRow}>
           <TouchableOpacity style={styles.regionBtn} onPress={() => setShowPicker(true)}>
             <Text style={styles.regionBtnFlag}>{region.flag}</Text>
@@ -209,7 +206,7 @@ export default function ProfileScreen() {
           <TextInput
             style={styles.input}
             placeholder="Name#TAG"
-            placeholderTextColor="#444"
+            placeholderTextColor={T.textMuted}
             value={input}
             onChangeText={setInput}
             onSubmitEditing={handleSearch}
@@ -224,7 +221,7 @@ export default function ProfileScreen() {
             disabled={loading}
           >
             {loading
-              ? <ActivityIndicator size="small" color="#0A0E1A" />
+              ? <ActivityIndicator size="small" color="#fff" />
               : <Text style={styles.searchBtnText}>GO</Text>
             }
           </TouchableOpacity>
@@ -236,6 +233,7 @@ export default function ProfileScreen() {
           </View>
         )}
 
+        {/* Results */}
         {profile && (
           <View style={{ marginTop: 8 }}>
             <ProfileHeader profile={profile} region={region} />
@@ -247,14 +245,12 @@ export default function ProfileScreen() {
                   style={[styles.tabBtn, activeTab === t && styles.tabBtnActive]}
                   onPress={() => setActiveTab(t)}
                 >
-                  <Text style={[styles.tabLabel, activeTab === t && styles.tabLabelActive]}>
-                    {t}
-                  </Text>
+                  <Text style={[styles.tabLabel, activeTab === t && styles.tabLabelActive]}>{t}</Text>
                 </TouchableOpacity>
               ))}
             </View>
 
-            {activeTab === 'Overview'  && <OverviewTab  profile={profile} />}
+            {activeTab === 'Overview'  && <OverviewTab profile={profile} />}
             {activeTab === 'Matches'   && (
               <MatchesTab
                 matches={matches}
@@ -267,28 +263,25 @@ export default function ProfileScreen() {
           </View>
         )}
 
+        {/* Empty / recent */}
         {!profile && !loading && !error && (
-          <View>
-            {recentSummoners.length > 0 ? (
-              <View style={{ marginTop: 8 }}>
-                <Text style={styles.sectionLabel}>RECENT SEARCHES</Text>
-                {recentSummoners.map((s, i) => (
-                  <RecentSummonerRow
-                    key={i}
-                    summoner={s}
-                    onPress={() => handleRecentTap(s)}
-                  />
-                ))}
-              </View>
-            ) : (
-              <View style={styles.emptyState}>
-                <Text style={styles.emptyIcon}>🔎</Text>
-                <Text style={styles.emptyText}>
-                  Select a region and enter{'\n'}a Riot ID to search
-                </Text>
-              </View>
-            )}
-          </View>
+          recentSummoners.length > 0 ? (
+            <View style={{ marginTop: 8 }}>
+              <Text style={styles.sectionLabel}>RECENT SEARCHES</Text>
+              {recentSummoners.map((s, i) => (
+                <RecentSummonerRow
+                  key={i}
+                  summoner={s}
+                  onPress={() => setInput(`${s.gameName}#${s.tagLine}`)}
+                />
+              ))}
+            </View>
+          ) : (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyIcon}>🔎</Text>
+              <Text style={styles.emptyText}>Select a region and enter{'\n'}a Riot ID to search</Text>
+            </View>
+          )
         )}
       </ScrollView>
     </KeyboardAvoidingView>
@@ -302,8 +295,7 @@ function RecentSummonerRow({ summoner, onPress }) {
       <Image source={{ uri: summoner.profileIconUrl }} style={styles.recentIcon} />
       <View style={styles.recentInfo}>
         <Text style={styles.recentName}>
-          {summoner.gameName}
-          <Text style={styles.recentTag}>#{summoner.tagLine}</Text>
+          {summoner.gameName}<Text style={styles.recentTag}>#{summoner.tagLine}</Text>
         </Text>
         <Text style={styles.recentLevel}>Level {summoner.level}</Text>
       </View>
@@ -315,7 +307,7 @@ function RecentSummonerRow({ summoner, onPress }) {
 // ─── Profile Header ───────────────────────────────────────────────────────────
 function ProfileHeader({ profile, region }) {
   return (
-    <LinearGradient colors={['#13182A', '#0F1320']} style={styles.profileCard}>
+    <View style={styles.profileCard}>
       <View style={styles.profileHeader}>
         <View style={styles.iconWrapper}>
           <Image source={{ uri: profile.summoner.profileIconUrl }} style={styles.profileIcon} />
@@ -333,7 +325,7 @@ function ProfileHeader({ profile, region }) {
           </View>
         </View>
       </View>
-    </LinearGradient>
+    </View>
   );
 }
 
@@ -348,11 +340,10 @@ function OverviewTab({ profile }) {
   );
 }
 
-// ─── Matches Tab — with queue filter ─────────────────────────────────────────
+// ─── Matches Tab ──────────────────────────────────────────────────────────────
 function MatchesTab({ matches, loading, queueFilter, onQueueChange }) {
   return (
     <View>
-      {/* Queue filter row */}
       <View style={styles.filterRow}>
         {QUEUE_FILTERS.map((f) => (
           <TouchableOpacity
@@ -368,17 +359,14 @@ function MatchesTab({ matches, loading, queueFilter, onQueueChange }) {
       </View>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#C89B3C" style={{ marginTop: 24 }} />
+        <ActivityIndicator size="large" color={T.accent} style={{ marginTop: 24 }} />
       ) : !matches ? (
         <LoadingBlock />
       ) : !matches.matches?.length ? (
         <EmptyBlock text="No matches found for this filter" />
       ) : (
         <View>
-          <Text style={styles.sectionLabel}>
-            RECENT MATCHES
-            {queueFilter.value ? `  ·  ${queueFilter.label.toUpperCase()}` : ''}
-          </Text>
+          <Text style={styles.sectionLabel}>RECENT MATCHES</Text>
           {matches.matches.map((match) => (
             <MatchRow key={match.matchId} match={match} />
           ))}
@@ -388,12 +376,11 @@ function MatchesTab({ matches, loading, queueFilter, onQueueChange }) {
   );
 }
 
-// ─── Match Row ────────────────────────────────────────────────────────────────
 function MatchRow({ match }) {
   const p        = match.player;
   const duration = `${Math.floor(match.gameDuration / 60)}:${String(match.gameDuration % 60).padStart(2, '0')}`;
   const qLabel   = QUEUE_LABELS[match.queueId] ?? match.gameMode;
-  const winColor = p.win ? '#4FBB82' : '#BB4F4F';
+  const winColor = p.win ? T.win : T.loss;
 
   return (
     <View style={[styles.matchRow, { borderLeftColor: winColor }]}>
@@ -414,13 +401,11 @@ function MatchRow({ match }) {
         <Text style={styles.matchChampName}>{p.championName}</Text>
         <Text style={styles.matchMeta}>{qLabel} · {duration}</Text>
         <View style={styles.matchKda}>
-          <Text style={styles.matchKdaText}>
-            <Text style={styles.matchK}>{p.kills}</Text>
-            <Text style={styles.matchSlash}> / </Text>
-            <Text style={styles.matchD}>{p.deaths}</Text>
-            <Text style={styles.matchSlash}> / </Text>
-            <Text style={styles.matchA}>{p.assists}</Text>
-          </Text>
+          <Text style={styles.matchK}>{p.kills}</Text>
+          <Text style={styles.matchSlash}> / </Text>
+          <Text style={styles.matchD}>{p.deaths}</Text>
+          <Text style={styles.matchSlash}> / </Text>
+          <Text style={styles.matchA}>{p.assists}</Text>
           <Text style={styles.matchKdaRatio}> ({p.kda.toFixed(2)} KDA)</Text>
         </View>
         <Text style={styles.matchStats}>
@@ -448,7 +433,6 @@ function MatchRow({ match }) {
 function ChampionsTab({ champions }) {
   if (!champions) return <LoadingBlock />;
   if (!champions.champions?.length) return <EmptyBlock text="No champion data yet — play some games first" />;
-
   return (
     <View>
       <Text style={styles.sectionLabel}>CHAMPION STATS</Text>
@@ -461,8 +445,7 @@ function ChampionsTab({ champions }) {
 
 function ChampionRow({ champ }) {
   const wrPct   = Math.round(champ.winRate * 100);
-  const wrColor = wrPct >= 60 ? '#4FBB82' : wrPct >= 50 ? '#C89B3C' : '#BB4F4F';
-
+  const wrColor = wrPct >= 60 ? T.win : wrPct >= 50 ? T.accent : T.loss;
   return (
     <View style={styles.champRow}>
       {champ.championIcon
@@ -487,14 +470,14 @@ function ChampionRow({ champ }) {
   );
 }
 
-// ─── Rank Card — image emblem with emoji fallback ─────────────────────────────
+// ─── Rank Card ────────────────────────────────────────────────────────────────
 function RankCard({ title, icon, stats }) {
   const [imgFailed, setImgFailed] = useState(false);
 
   if (!stats) {
     return (
-      <View style={[styles.rankCard, styles.rankCardUnranked]}>
-        <View style={[styles.emblemWrapper, styles.emblemUnranked]}>
+      <View style={styles.rankCard}>
+        <View style={[styles.emblemWrapper, { backgroundColor: '#2a2a2a', borderColor: '#3a3a3a' }]}>
           <Text style={styles.emblemEmoji}>➖</Text>
           <Text style={styles.emblemLabel}>NONE</Text>
         </View>
@@ -508,17 +491,12 @@ function RankCard({ title, icon, stats }) {
 
   const cfg        = TIER_CONFIG[stats.tier] ?? TIER_CONFIG.IRON;
   const wrPct      = Math.round(stats.winRate * 100);
-  const wrColor    = wrPct >= 60 ? '#4FBB82' : wrPct >= 50 ? '#C89B3C' : '#BB4F4F';
-  const rankSuffix = ['MASTER', 'GRANDMASTER', 'CHALLENGER'].includes(stats.tier)
-    ? '' : ` ${stats.rank}`;
+  const wrColor    = wrPct >= 60 ? T.win : wrPct >= 50 ? T.accent : T.loss;
+  const rankSuffix = ['MASTER', 'GRANDMASTER', 'CHALLENGER'].includes(stats.tier) ? '' : ` ${stats.rank}`;
 
   return (
-    <LinearGradient
-      colors={[cfg.bg, '#0A0E1A']}
-      style={[styles.rankCard, { borderColor: cfg.color + '55' }]}
-    >
-      {/* Emblem — image with emoji fallback if CDN fails */}
-      <View style={[styles.emblemWrapper, { borderColor: cfg.color + '55', backgroundColor: cfg.color + '11' }]}>
+    <View style={[styles.rankCard, { borderColor: cfg.color + '44' }]}>
+      <View style={[styles.emblemWrapper, { borderColor: cfg.color + '55', backgroundColor: cfg.color + '18' }]}>
         {!imgFailed ? (
           <Image
             source={{ uri: tierEmblemUrl(stats.tier) }}
@@ -558,7 +536,7 @@ function RankCard({ title, icon, stats }) {
           </View>
         )}
       </View>
-    </LinearGradient>
+    </View>
   );
 }
 
@@ -591,7 +569,7 @@ function RegionPickerModal({ visible, selected, onSelect, onClose }) {
 
 // ─── Backend Status ───────────────────────────────────────────────────────────
 function BackendStatus({ online }) {
-  const color = online === null ? '#555' : online ? '#4FBB82' : '#BB4F4F';
+  const color = online === null ? T.textMuted : online ? T.accent : T.loss;
   const text  = online === null ? 'Checking server…'
               : online          ? 'Server online'
               : 'Server offline — start the backend first';
@@ -604,9 +582,8 @@ function BackendStatus({ online }) {
 }
 
 const LoadingBlock = () => (
-  <ActivityIndicator size="large" color="#C89B3C" style={{ marginTop: 32 }} />
+  <ActivityIndicator size="large" color={T.accent} style={{ marginTop: 32 }} />
 );
-
 const EmptyBlock = ({ text }) => (
   <View style={styles.emptyBlock}>
     <Text style={styles.emptyBlockText}>{text}</Text>
@@ -616,151 +593,152 @@ const EmptyBlock = ({ text }) => (
 // ─── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   container:         { paddingHorizontal: 16 },
-  title:             { fontSize: 32, fontWeight: '900', color: '#C89B3C', letterSpacing: 4, marginBottom: 4 },
-  subtitle:          { fontSize: 13, color: '#555', marginBottom: 10 },
+
+  // Header — #4b995c green
+  title:             { fontSize: 32, fontWeight: '900', color: T.accent, letterSpacing: 4, marginBottom: 4, fontFamily: T.font },
+  subtitle:          { fontSize: 13, color: T.textMuted, marginBottom: 10, fontFamily: T.font },
 
   statusRow:         { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 14 },
   statusDot:         { width: 8, height: 8, borderRadius: 4 },
-  statusText:        { fontSize: 12 },
+  statusText:        { fontSize: 12, fontFamily: T.font },
 
+  // Search
   searchRow:         { flexDirection: 'row', gap: 8, marginBottom: 12, alignItems: 'center' },
   regionBtn:         {
     flexDirection: 'row', alignItems: 'center', gap: 4,
-    backgroundColor: '#13182A', borderRadius: 12,
+    backgroundColor: T.card, borderRadius: 10,
     paddingHorizontal: 10, height: 50,
-    borderWidth: 1, borderColor: '#1E2740',
+    borderWidth: 1, borderColor: T.cardBorder,
   },
   regionBtnFlag:     { fontSize: 16 },
-  regionBtnLabel:    { color: '#C89B3C', fontWeight: '700', fontSize: 12 },
-  regionBtnArrow:    { color: '#555', fontSize: 10 },
+  regionBtnLabel:    { color: T.accent, fontWeight: '700', fontSize: 12, fontFamily: T.font },
+  regionBtnArrow:    { color: T.textMuted, fontSize: 10 },
   input:             {
-    flex: 1, height: 50, backgroundColor: '#13182A',
-    borderRadius: 12, paddingHorizontal: 14,
-    color: '#E8E0D0', fontSize: 15,
-    borderWidth: 1, borderColor: '#1E2740',
+    flex: 1, height: 50, backgroundColor: T.card,
+    borderRadius: 10, paddingHorizontal: 14,
+    color: T.textPri, fontSize: 15,
+    borderWidth: 1, borderColor: T.cardBorder,
+    fontFamily: T.font,
   },
-  searchBtn:         { width: 56, height: 50, backgroundColor: '#C89B3C', borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
+  searchBtn:         { width: 56, height: 50, backgroundColor: T.accent, borderRadius: 10, justifyContent: 'center', alignItems: 'center' },
   searchBtnDisabled: { opacity: 0.5 },
-  searchBtnText:     { color: '#0A0E1A', fontWeight: '900', fontSize: 14 },
+  searchBtnText:     { color: '#fff', fontWeight: '900', fontSize: 14, fontFamily: T.font },
 
-  errorBox:          { backgroundColor: '#2A0F0F', borderRadius: 10, padding: 12, borderLeftWidth: 3, borderLeftColor: '#BB4F4F', marginBottom: 12 },
-  errorText:         { color: '#FF6B6B', fontSize: 13, lineHeight: 18 },
+  errorBox:          { backgroundColor: '#2a1010', borderRadius: 8, padding: 12, borderLeftWidth: 3, borderLeftColor: T.loss, marginBottom: 12 },
+  errorText:         { color: '#ff7070', fontSize: 13, lineHeight: 18, fontFamily: T.font },
 
   // Recent
-  recentRow:         { flexDirection: 'row', alignItems: 'center', backgroundColor: '#13182A', borderRadius: 12, padding: 12, marginBottom: 8, borderWidth: 1, borderColor: '#1E2740', gap: 12 },
-  recentIcon:        { width: 44, height: 44, borderRadius: 22, borderWidth: 1, borderColor: '#C89B3C44' },
+  recentRow:         { flexDirection: 'row', alignItems: 'center', backgroundColor: T.card, borderRadius: 10, padding: 12, marginBottom: 8, borderWidth: 1, borderColor: T.cardBorder, gap: 12 },
+  recentIcon:        { width: 44, height: 44, borderRadius: 22, borderWidth: 1, borderColor: T.accentDim },
   recentInfo:        { flex: 1 },
-  recentName:        { color: '#E8E0D0', fontWeight: '700', fontSize: 14 },
-  recentTag:         { color: '#555', fontWeight: '400' },
-  recentLevel:       { color: '#555', fontSize: 12, marginTop: 2 },
-  recentArrow:       { color: '#C89B3C', fontSize: 22, fontWeight: '300' },
+  recentName:        { color: T.textPri, fontWeight: '700', fontSize: 14, fontFamily: T.font },
+  recentTag:         { color: T.textMuted, fontWeight: '400' },
+  recentLevel:       { color: T.textSec, fontSize: 12, marginTop: 2, fontFamily: T.font },
+  recentArrow:       { color: T.accent, fontSize: 22, fontWeight: '300' },
 
-  // Profile card
-  profileCard:       { borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#1E2740', marginBottom: 4 },
+  // Profile card — rgb(44,44,44)
+  profileCard:       { backgroundColor: T.card, borderRadius: 12, padding: 16, borderWidth: 1, borderColor: T.cardBorder, marginBottom: 4 },
   profileHeader:     { flexDirection: 'row', alignItems: 'center', gap: 16 },
   iconWrapper:       { position: 'relative' },
-  profileIcon:       { width: 72, height: 72, borderRadius: 36, borderWidth: 2, borderColor: '#C89B3C' },
-  levelBadge:        { position: 'absolute', bottom: -6, left: '50%', marginLeft: -14, backgroundColor: '#C89B3C', borderRadius: 10, paddingHorizontal: 8, paddingVertical: 2, minWidth: 28, alignItems: 'center' },
-  levelText:         { color: '#0A0E1A', fontSize: 11, fontWeight: '900' },
+  profileIcon:       { width: 72, height: 72, borderRadius: 36, borderWidth: 2, borderColor: T.accent },
+  levelBadge:        { position: 'absolute', bottom: -6, left: '50%', marginLeft: -14, backgroundColor: T.accent, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 2, minWidth: 28, alignItems: 'center' },
+  levelText:         { color: '#fff', fontSize: 11, fontWeight: '900', fontFamily: T.font },
   profileInfo:       { flex: 1 },
-  summonerName:      { color: '#E8E0D0', fontSize: 20, fontWeight: '800' },
-  tagLine:           { color: '#555', fontSize: 16, fontWeight: '400' },
-  regionPill:        { marginTop: 6, alignSelf: 'flex-start', backgroundColor: '#1A1508', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1, borderColor: '#C89B3C44' },
-  regionPillText:    { color: '#C89B3C', fontSize: 11, fontWeight: '600' },
+  summonerName:      { color: T.textPri, fontSize: 20, fontWeight: '800', fontFamily: T.font },
+  tagLine:           { color: T.textMuted, fontSize: 16, fontWeight: '400' },
+  regionPill:        { marginTop: 6, alignSelf: 'flex-start', backgroundColor: T.accentBg, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1, borderColor: T.accentDim },
+  regionPillText:    { color: T.accent, fontSize: 11, fontWeight: '600', fontFamily: T.font },
 
   // Tabs
   tabBar:            { flexDirection: 'row', gap: 8, marginTop: 14, marginBottom: 4 },
-  tabBtn:            { paddingVertical: 8, paddingHorizontal: 16, borderRadius: 20, backgroundColor: '#13182A', borderWidth: 1, borderColor: '#1E2740' },
-  tabBtnActive:      { backgroundColor: '#C89B3C', borderColor: '#C89B3C' },
-  tabLabel:          { color: '#555', fontWeight: '700', fontSize: 12 },
-  tabLabelActive:    { color: '#0A0E1A' },
+  tabBtn:            { paddingVertical: 8, paddingHorizontal: 16, borderRadius: 20, backgroundColor: T.card, borderWidth: 1, borderColor: T.cardBorder },
+  tabBtnActive:      { backgroundColor: T.accent, borderColor: T.accent },
+  tabLabel:          { color: T.textMuted, fontWeight: '700', fontSize: 12, fontFamily: T.font },
+  tabLabelActive:    { color: '#fff' },
 
-  sectionLabel:      { color: '#C89B3C', fontSize: 11, fontWeight: '700', letterSpacing: 2, marginBottom: 10, marginTop: 14 },
+  sectionLabel:      { color: T.accent, fontSize: 11, fontWeight: '700', letterSpacing: 2, marginBottom: 10, marginTop: 14, fontFamily: T.font },
 
   // Queue filter
   filterRow:         { flexDirection: 'row', gap: 8, marginTop: 14, marginBottom: 2 },
-  filterBtn:         { paddingVertical: 6, paddingHorizontal: 14, borderRadius: 16, backgroundColor: '#13182A', borderWidth: 1, borderColor: '#1E2740' },
-  filterBtnActive:   { backgroundColor: '#1E2740', borderColor: '#C89B3C55' },
-  filterLabel:       { color: '#444', fontWeight: '600', fontSize: 12 },
-  filterLabelActive: { color: '#C89B3C' },
+  filterBtn:         { paddingVertical: 6, paddingHorizontal: 14, borderRadius: 16, backgroundColor: T.card, borderWidth: 1, borderColor: T.cardBorder },
+  filterBtnActive:   { borderColor: T.accent, backgroundColor: T.accentBg },
+  filterLabel:       { color: T.textMuted, fontWeight: '600', fontSize: 12, fontFamily: T.font },
+  filterLabelActive: { color: T.accent },
 
-  // Rank card
-  rankCard:          { borderRadius: 16, padding: 16, marginBottom: 12, flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1 },
-  rankCardUnranked:  { backgroundColor: '#13182A', borderColor: '#1E2740' },
+  // Rank card — rgb(44,44,44)
+  rankCard:          { backgroundColor: T.card, borderRadius: 12, padding: 16, marginBottom: 12, flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1, borderColor: T.cardBorder },
   emblemWrapper:     { width: 68, height: 68, borderRadius: 34, borderWidth: 2, justifyContent: 'center', alignItems: 'center', overflow: 'hidden' },
-  emblemUnranked:    { backgroundColor: '#1E2740', borderColor: '#2A2A3A' },
   emblemImage:       { width: 68, height: 68 },
   emblemEmoji:       { fontSize: 28 },
-  emblemLabel:       { fontSize: 8, fontWeight: '800', marginTop: 2, color: '#555' },
+  emblemLabel:       { fontSize: 8, fontWeight: '800', marginTop: 2, color: T.textMuted, fontFamily: T.font },
   rankInfo:          { flex: 1 },
-  rankCardTitle:     { color: '#888', fontSize: 12, fontWeight: '600', marginBottom: 4 },
-  tierText:          { fontSize: 18, fontWeight: '900', letterSpacing: 1 },
-  lpText:            { fontSize: 13, fontWeight: '700', marginTop: 2 },
+  rankCardTitle:     { color: T.textSec, fontSize: 12, fontWeight: '600', marginBottom: 4, fontFamily: T.font },
+  tierText:          { fontSize: 18, fontWeight: '900', letterSpacing: 1, fontFamily: T.font },
+  lpText:            { fontSize: 13, fontWeight: '700', marginTop: 2, fontFamily: T.font },
   wlRow:             { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
-  wins:              { color: '#4FBB82', fontWeight: '700', fontSize: 13 },
-  wlSep:             { color: '#444', fontSize: 13 },
-  losses:            { color: '#BB4F4F', fontWeight: '700', fontSize: 13 },
-  unrankedText:      { color: '#444', fontSize: 15, fontWeight: '600', marginTop: 4 },
+  wins:              { color: T.win, fontWeight: '700', fontSize: 13, fontFamily: T.font },
+  wlSep:             { color: T.textMuted, fontSize: 13 },
+  losses:            { color: T.loss, fontWeight: '700', fontSize: 13, fontFamily: T.font },
+  unrankedText:      { color: T.textMuted, fontSize: 15, fontWeight: '600', marginTop: 4, fontFamily: T.font },
   rankRight:         { alignItems: 'center', gap: 8 },
   ringOuter:         { width: 58, height: 58, borderRadius: 29, borderWidth: 4, justifyContent: 'center', alignItems: 'center' },
-  ringText:          { fontSize: 13, fontWeight: '800' },
-  ringLabel:         { color: '#555', fontSize: 9, fontWeight: '700' },
-  hotStreakBadge:    { backgroundColor: '#2A1500', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2, borderWidth: 1, borderColor: '#FF6B0033' },
-  hotStreakText:     { color: '#FF8C00', fontSize: 10, fontWeight: '700' },
+  ringText:          { fontSize: 13, fontWeight: '800', fontFamily: T.font },
+  ringLabel:         { color: T.textMuted, fontSize: 9, fontWeight: '700', fontFamily: T.font },
+  hotStreakBadge:    { backgroundColor: '#2a1500', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2, borderWidth: 1, borderColor: '#ff6b0033' },
+  hotStreakText:     { color: '#ff8c00', fontSize: 10, fontWeight: '700', fontFamily: T.font },
 
-  // Match row
-  matchRow:          { backgroundColor: '#13182A', borderRadius: 12, padding: 12, marginBottom: 8, flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: '#1E2740', borderLeftWidth: 4 },
+  // Match row — rgb(44,44,44)
+  matchRow:          { backgroundColor: T.card, borderRadius: 10, padding: 12, marginBottom: 8, flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: T.cardBorder, borderLeftWidth: 4 },
   matchLeft:         { flexDirection: 'row', alignItems: 'center', gap: 4 },
   matchChampIcon:    { width: 44, height: 44, borderRadius: 22 },
   spellsCol:         { gap: 2 },
   spellIcon:         { width: 20, height: 20, borderRadius: 4 },
-  spellIconEmpty:    { width: 20, height: 20, borderRadius: 4, backgroundColor: '#1E2740' },
+  spellIconEmpty:    { width: 20, height: 20, borderRadius: 4, backgroundColor: '#333' },
   matchInfo:         { flex: 1 },
-  matchChampName:    { color: '#E8E0D0', fontWeight: '700', fontSize: 13 },
-  matchMeta:         { color: '#555', fontSize: 11, marginBottom: 2 },
+  matchChampName:    { color: T.textPri, fontWeight: '700', fontSize: 13, fontFamily: T.font },
+  matchMeta:         { color: T.textMuted, fontSize: 11, marginBottom: 2, fontFamily: T.font },
   matchKda:          { flexDirection: 'row', alignItems: 'center' },
-  matchKdaText:      { fontSize: 13 },
-  matchK:            { color: '#E8E0D0', fontWeight: '700' },
-  matchSlash:        { color: '#444' },
-  matchD:            { color: '#BB4F4F', fontWeight: '700' },
-  matchA:            { color: '#E8E0D0', fontWeight: '700' },
-  matchKdaRatio:     { color: '#888', fontSize: 11 },
-  matchStats:        { color: '#555', fontSize: 11, marginTop: 2 },
+  matchK:            { color: T.textPri, fontWeight: '700', fontSize: 13, fontFamily: T.font },
+  matchSlash:        { color: T.textMuted, fontSize: 13 },
+  matchD:            { color: T.loss, fontWeight: '700', fontSize: 13, fontFamily: T.font },
+  matchA:            { color: T.textPri, fontWeight: '700', fontSize: 13, fontFamily: T.font },
+  matchKdaRatio:     { color: T.textSec, fontSize: 11, fontFamily: T.font },
+  matchStats:        { color: T.textMuted, fontSize: 11, marginTop: 2, fontFamily: T.font },
   matchRight:        { alignItems: 'flex-end', gap: 6 },
   winBadge:          { borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1 },
-  winBadgeText:      { fontSize: 11, fontWeight: '800' },
+  winBadgeText:      { fontSize: 11, fontWeight: '800', fontFamily: T.font },
   itemsGrid:         { flexDirection: 'row', flexWrap: 'wrap', gap: 2, width: 72 },
   itemIcon:          { width: 22, height: 22, borderRadius: 4 },
-  itemIconEmpty:     { width: 22, height: 22, borderRadius: 4, backgroundColor: '#1E2740' },
+  itemIconEmpty:     { width: 22, height: 22, borderRadius: 4, backgroundColor: '#333' },
 
-  // Champion row
-  champRow:          { backgroundColor: '#13182A', borderRadius: 12, padding: 12, marginBottom: 8, flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: '#1E2740' },
+  // Champion row — rgb(44,44,44)
+  champRow:          { backgroundColor: T.card, borderRadius: 10, padding: 12, marginBottom: 8, flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: T.cardBorder },
   champIcon:         { width: 40, height: 40, borderRadius: 20 },
-  champIconEmpty:    { width: 40, height: 40, borderRadius: 20, backgroundColor: '#1E2740' },
+  champIconEmpty:    { width: 40, height: 40, borderRadius: 20, backgroundColor: '#333' },
   champLeft:         { width: 80 },
-  champName:         { color: '#E8E0D0', fontWeight: '700', fontSize: 12 },
-  champGames:        { color: '#555', fontSize: 11, marginTop: 2 },
+  champName:         { color: T.textPri, fontWeight: '700', fontSize: 12, fontFamily: T.font },
+  champGames:        { color: T.textMuted, fontSize: 11, marginTop: 2, fontFamily: T.font },
   champMid:          { flex: 1 },
-  champKda:          { color: '#E8E0D0', fontSize: 12, fontWeight: '600' },
-  champKdaLabel:     { color: '#555', fontSize: 11, marginTop: 2 },
+  champKda:          { color: T.textPri, fontSize: 12, fontWeight: '600', fontFamily: T.font },
+  champKdaLabel:     { color: T.textMuted, fontSize: 11, marginTop: 2, fontFamily: T.font },
   champRight:        { alignItems: 'flex-end' },
-  champWr:           { fontSize: 17, fontWeight: '900' },
-  champWrLabel:      { color: '#555', fontSize: 11, marginTop: 2 },
+  champWr:           { fontSize: 17, fontWeight: '900', fontFamily: T.font },
+  champWrLabel:      { color: T.textMuted, fontSize: 11, marginTop: 2, fontFamily: T.font },
 
   // Modal
-  modalBackdrop:     { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'flex-end' },
-  modalSheet:        { backgroundColor: '#13182A', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 24 },
-  modalTitle:        { color: '#C89B3C', fontSize: 11, fontWeight: '700', letterSpacing: 2, marginBottom: 16, textAlign: 'center' },
+  modalBackdrop:     { flex: 1, backgroundColor: 'rgba(0,0,0,0.75)', justifyContent: 'flex-end' },
+  modalSheet:        { backgroundColor: T.card, borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 24 },
+  modalTitle:        { color: T.accent, fontSize: 11, fontWeight: '700', letterSpacing: 2, marginBottom: 16, textAlign: 'center', fontFamily: T.font },
   regionGrid:        { flexDirection: 'row', flexWrap: 'wrap', gap: 10, justifyContent: 'center' },
-  regionItem:        { width: 72, alignItems: 'center', padding: 10, backgroundColor: '#0A0E1A', borderRadius: 12, borderWidth: 1, borderColor: '#1E2740' },
-  regionItemActive:  { borderColor: '#C89B3C', backgroundColor: '#1A1508' },
+  regionItem:        { width: 72, alignItems: 'center', padding: 10, backgroundColor: T.bg, borderRadius: 10, borderWidth: 1, borderColor: T.cardBorder },
+  regionItemActive:  { borderColor: T.accent, backgroundColor: T.accentBg },
   regionFlag:        { fontSize: 22, marginBottom: 4 },
-  regionLabel:       { color: '#666', fontSize: 11, fontWeight: '700' },
-  regionLabelActive: { color: '#C89B3C' },
+  regionLabel:       { color: T.textSec, fontSize: 11, fontWeight: '700', fontFamily: T.font },
+  regionLabelActive: { color: T.accent },
 
   emptyState:        { alignItems: 'center', marginTop: 60, gap: 12 },
   emptyIcon:         { fontSize: 48 },
-  emptyText:         { color: '#444', fontSize: 14, textAlign: 'center', lineHeight: 22 },
+  emptyText:         { color: T.textMuted, fontSize: 14, textAlign: 'center', lineHeight: 22, fontFamily: T.font },
   emptyBlock:        { alignItems: 'center', paddingVertical: 32 },
-  emptyBlockText:    { color: '#444', fontSize: 13 },
+  emptyBlockText:    { color: T.textMuted, fontSize: 13, fontFamily: T.font },
 });
