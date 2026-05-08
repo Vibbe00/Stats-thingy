@@ -1,0 +1,32 @@
+The site/app isn't hosted anywhere and has to be run locally if you wish to test it, and you would also need a .env file with our api keys
+
+product backlog (Hacknplan) Here are the sprints, backlog is empty now but we created the tasks in the backlog first
+    sprint1(https://app.hacknplan.com/p/234913/kanban?categoryId=0&boardId=663580)
+    sprint2(https://app.hacknplan.com/p/234913/kanban?categoryId=0&boardId=664717)
+    sprint3(https://app.hacknplan.com/p/234913/kanban?categoryId=0&boardId=666061)
+    sprint4(https://app.hacknplan.com/p/234913/kanban?categoryId=0&boardId=667440)
+    sprint5(https://app.hacknplan.com/p/234913/kanban?categoryId=0&boardId=668924)
+
+Meetings and meeting memos we held in discord and we logged the meeting times and the short explanations as to what happened in each meeting into a board in hacknplan, we also marked the presentation prep hours and guidance hours into this board
+    meetings and such(https://app.hacknplan.com/p/234913/kanban?categoryId=0&boardId=663585)
+
+Marking working hours
+    Hacknplan links
+        https://app.hacknplan.com/p/234913/reports/metrics?scope=project&userId=259463
+        https://app.hacknplan.com/p/234913/reports/metrics?scope=project&userId=259464
+        https://app.hacknplan.com/p/234913/reports/metrics?scope=project&userId=259465
+
+also pictures just in case
+
+![alt text](image.png)
+![alt text](image-1.png)
+![alt text](image-2.png)
+
+Team working
+    We split the work simply into backend/mobile/web and don't have a separate bit showing the work split
+    Ville Did backend, Tuomo did web and Topi did mobile
+
+Outcomes
+    as stated at the start this isn't hosted anywhere at the moment but can be ran locally via npm run dev commands on the backend and web sides, and via expo on the mobile side. NOTE you have to run the backend for everything to work in the frontend so you'll need 2 terminals to run the backend and frontend.
+
+    another note i will send a notification via outlook to Matti about this readme and i will include the api keys in there if you wish to test it during the grading process. 
