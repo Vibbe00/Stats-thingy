@@ -18,7 +18,9 @@ Marking working hours
 
 also pictures just in case
 
-image-1.png
+![image-1.png](image-1.png)
+![alt text](image-2.png)
+![alt text](image.png)
 
 Team working
     We split the work simply into backend/mobile/web and don't have a separate bit showing the work split
