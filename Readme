@@ -30,3 +30,11 @@ Outcomes
     as stated at the start this isn't hosted anywhere at the moment but can be ran locally via npm run dev commands on the backend and web sides, and via expo on the mobile side. NOTE you have to run the backend for everything to work in the frontend so you'll need 2 terminals to run the backend and frontend.
 
     another note i will send a notification via outlook to Matti about this readme and i will include the api keys in there if you wish to test it during the grading process. 
+
+
+
+I forgot to add account creds if you wish to test this for the grading so here it is:
+
+    server: EUW
+    Name: Skyde789
+    TagLine: Riven
