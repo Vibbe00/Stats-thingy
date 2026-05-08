@@ -46,7 +46,7 @@ const CHAMPION_NAME_FIXES: Record<string, string> = {
 
 export function championIconUrl(championName: string, version: string): string {
     const name = CHAMPION_NAME_FIXES[championName] ?? championName;
-    return `https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${championName}.png`;
+    return `https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${name}.png`;
 }
 
 export function summonerSpellIconUrl(spellId: number, version: string): string | null {
